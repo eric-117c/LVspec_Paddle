@@ -4,3 +4,6 @@ accelerate
 numpy
 qwen-vl-utils
 av
+sentencepiece
+protobuf
+pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0

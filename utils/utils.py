@@ -6,8 +6,8 @@ from datasets import load_dataset, concatenate_datasets
 import av
 
 from transformers import AutoProcessor 
-from models.modeling_llava_onevision_tree import LlavaOnevisionForConditionalGeneration
 
+from models.modeling_llava_onevision_tree import LlavaOnevisionForConditionalGeneration
 from models.modeling_qwen2_5_vl import Qwen2_5_VLForConditionalGeneration
 from models.processing_qwen2_5_vl import Qwen2_5_VLProcessor
 from qwen_vl_utils import process_vision_info
@@ -60,16 +60,16 @@ def load_model(model_type, base_model_path, draft_model_path):
 def load_data(task, data_num, data_path):
     if task == "VideoDetailCaption":
         data_video = load_dataset(
-                "/data/ycji/datasets/VideoDetailCaption",
+                "VideoDetailCaption",
                 split="test",
                 # cache_dir=cache_dir,
             ).shuffle(seed=42).select(range(data_num))
-        
+
+        video_dir = os.path.join(data_path, "Test_Videos/")
         def video_exists(example):
             video_path = os.path.join(video_dir, f"{example['video_name']}.mp4")
             return os.path.exists(video_path)
 
-        video_dir = os.path.join(data_path, "Test_Videos")
         filtered_data = data_video.filter(video_exists)
         data_video = filtered_data
     elif task == 'MVBench':
@@ -537,6 +537,51 @@ def clip_input(processor, data_instance):
     print("input id length:", inputs['input_ids'].shape[1])
     return inputs
 
+import os
+import numpy as np
+from PIL import Image
+
+def save_video_frames(video: np.ndarray, save_dir: str, prefix: str = "frame", ext: str = "png"):
+    """
+    Save frames from a numpy video array to disk.
+
+    Args:
+        video: np.ndarray, shape [T, H, W, C] or [H, W, C] or [T, H, W]
+        save_dir: output directory
+        prefix: filename prefix
+        ext: 'png' or 'jpg'
+    """
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Normalize shapes to [T, H, W, C]
+    if video.ndim == 3:
+        # Could be [H, W, C] or [T, H, W]
+        if video.shape[-1] in (1, 3, 4):
+            video = video[None, ...]  # [1, H, W, C]
+        else:
+            video = video[..., None]  # [T, H, W, 1]
+    elif video.ndim != 4:
+        raise ValueError(f"Unexpected video shape: {video.shape}")
+
+    T = video.shape[0]
+    for t in range(T):
+        frame = video[t]
+        # Handle grayscale
+        if frame.ndim == 3 and frame.shape[-1] == 1:
+            frame = frame.squeeze(-1)
+
+        # Ensure uint8
+        if frame.dtype != np.uint8:
+            frame = np.clip(frame, 0, 255).astype(np.uint8)
+
+        img = Image.fromarray(frame)
+        out_path = os.path.join(save_dir, f"{prefix}_{t:04d}.{ext}")
+        img.save(out_path)
+
+    print(f"Saved {T} frames to: {save_dir}")
+
+
+
 
 def clip_input_video(processor, task, data_instance, frame_num=64, model_type='llava_ov',data_path=None):
     if model_type == 'llava_ov':
@@ -544,6 +589,7 @@ def clip_input_video(processor, task, data_instance, frame_num=64, model_type='l
             video_path = os.path.join(data_path, "Test_Videos/")
             video_name = data_instance["video_name"]
             video_path = video_path + video_name + ".mp4"
+
 
             question = data_instance["question"]
             conversation = [
@@ -561,6 +607,10 @@ def clip_input_video(processor, task, data_instance, frame_num=64, model_type='l
             # print("Total frames:",total_frames)
             indices = np.arange(0, total_frames, total_frames / frame_num).astype(int)
             video = read_video_pyav(container, indices)
+
+            # save_dir = "./fig_frames"
+            # save_video_frames(video, save_dir, prefix="frame", ext="png")
+
             
         elif task == "MVBench":
             video_path = data_path
@@ -633,6 +683,9 @@ def clip_input_video(processor, task, data_instance, frame_num=64, model_type='l
         # display_frame_grid(video)
         # save_frames(video)
         prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+        # print("video shape:", video.shape)
+        # print(processor)
+        # print(prompt)
         inputs = processor(videos=list(video), text=prompt, return_tensors="pt").to("cuda")
 
     elif model_type == 'qwen2_5_vl':
@@ -710,3 +763,13 @@ def clip_input_video(processor, task, data_instance, frame_num=64, model_type='l
     
     print("INFO: Input length:", inputs['input_ids'].shape[1])
     return inputs
+
+
+
+
+
+
+
+
+
+

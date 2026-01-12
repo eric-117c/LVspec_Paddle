@@ -3,7 +3,7 @@ import torch
 from tqdm import tqdm
 import json
 import argparse
-from tree_choices.choices import mc_sim_7b_63, chain
+from tree_choices.choices import *
 from utils.utils import *
 # from visualize import *
 
@@ -18,81 +18,71 @@ def run_eval(model_type, model, draft_model, data_video, task, frame_num, evalua
     results = {}
 
     results['ar_two_stage_decode'] = []
+    results['ar_two_stage_len'] = []
 
-    results['sd_tree_two_stage_decode'] = []
-    results['sd_tree_two_stage_accept_length'] = []
+    results['LVSpec_decode'] = []
+    results['LVSpec_accept_length'] = []
+    results['LVSpec_len'] = []
 
-    results['specvlm_decode'] = []
-    results['specvlm_accept_length'] = []
 
     for i in tqdm(range(evaluation_num)):
         data_instance = data_video[i]
+        # print(data_instance)
 
-        # AR two stage
+        # AR
         inputs = clip_input_video(processor, task, data_instance,frame_num = frame_num, model_type = model_type, data_path=data_path)
         if inputs == None:
             continue
 
-        output_ar = AR_generate(inputs, model ,max_new_tokens=max_new_tokens, video_token_id=video_token_id)
-        
+        output_ar = AR_generate_one_stage(inputs, model ,max_new_tokens=max_new_tokens, video_token_id=video_token_id, processor=processor)
         print("\n")
         print("-------Autoregressive Decoding-------")
         # print("Inference Time:", output_ar['inference_time'])
         print("Decoding Time:", output_ar['decoding_time'])
+        print("Generate Len:", output_ar['generate_len'])
         output_text = processor.batch_decode(output_ar['output_ids'], skip_special_tokens=True)[0]
         print("Output:")
         print(output_text)
         print("\n")
         results['ar_two_stage_decode'].append(output_ar['decoding_time'])
+        results['ar_two_stage_len'].append(output_ar['generate_len'])
 
-        # SD tree two stage  
+        
+
+
+        # lvspec
         inputs = clip_input_video(processor, task, data_instance,frame_num = frame_num, model_type = model_type, data_path=data_path)
-        output_sd = SD_generate(
+        output_lvspec = SD_generate_with_pruning(
                 inputs,
                 model,
                 draft_model,
                 processor,
-                max_new_tokens=max_new_tokens,
-                video_token_id=video_token_id,
-                tree_choices=mc_sim_7b_63,
-        )
-        print("\n")
-        print("-------Naive Speculative Decoding (with tree attn)-------")
-        # print("Inference Time:", output_sd['inference_time'])
-        print("Decoding Time:", output_sd['decoding_time'])
-        print("Average Accept Length:", output_sd["mean_accept_length"].item())
-        output_text = processor.batch_decode(output_sd['output_ids'], skip_special_tokens=True)[0]
-        print("Output:")
-        print(output_text)
-        print("\n")
-        results['sd_tree_two_stage_decode'].append(output_sd['decoding_time'])
-        results['sd_tree_two_stage_accept_length'].append(output_sd["mean_accept_length"])
-
-        # SpecVLM
-        inputs = clip_input_video(processor, task, data_instance,frame_num = frame_num, model_type = model_type, data_path=data_path)
-        output_specvlm = SD_generate_with_pruning(
-                inputs,
-                model,
-                draft_model,
-                processor,
-                method = 'specvlm',
+                method = 'uniform',
                 drop_rate = drop_rate,
                 video_token_id = video_token_id,
                 max_new_tokens=max_new_tokens,
-                tree_choices=mc_sim_7b_63,
+                tree_choices=chain,
                 percentage=0.4,
+                loose='hidden_topk',
+                loose_window=2,
         )
         print("\n")
-        print("-------SpecVLM-------")
-        # print("Inference Time:", output_specvlm['inference_time'])
-        print("Decoding Time:", output_specvlm['decoding_time'])
-        print("Average Accept Length:", output_specvlm["mean_accept_length"].item())
-        output_text = processor.batch_decode(output_specvlm['output_ids'], skip_special_tokens=True)[0]
+        print("-------LVSpec-------")
+        # print("Inference Time:", output_lvspec['inference_time'])
+        print("Decoding Time:", output_lvspec['decoding_time'])
+        print("Average Accept Length:", output_lvspec["mean_accept_length"].item())
+        print("Generate Len:", output_lvspec['generate_len'])
+        output_text = processor.batch_decode(output_lvspec['output_ids'], skip_special_tokens=True)[0]
         print("Output:")
         print(output_text)
         print("\n")
-        results['specvlm_decode'].append(output_specvlm['decoding_time'])
-        results['specvlm_accept_length'].append(output_specvlm["mean_accept_length"])
+        results['LVSpec_decode'].append(output_lvspec['decoding_time'])
+        results['LVSpec_accept_length'].append(output_lvspec["mean_accept_length"])
+        results['LVSpec_len'].append(output_lvspec['generate_len'])
+
+
+
+
 
     
     # Save results
@@ -104,37 +94,40 @@ def run_eval(model_type, model, draft_model, data_video, task, frame_num, evalua
 
         # Two stage
         print("Autoregressive Decoding Time:", sum(results['ar_two_stage_decode'])/len(results['ar_two_stage_decode']))
+        print("Autoregressive Generate Len:", (sum(results['ar_two_stage_len'])/len(results['ar_two_stage_len'])))
+        print("Autoregressive token/s:", (sum(results['ar_two_stage_len'])/sum(results['ar_two_stage_decode'])))
         print("\n")
 
-        print("Naive SD Decoding Time:", sum(results['sd_tree_two_stage_decode'])/len(results['sd_tree_two_stage_decode']))
-        print("Naive SD Average Accept Length:", (sum(results['sd_tree_two_stage_accept_length'])/len(results['sd_tree_two_stage_accept_length'])).item())
-        print("\n")
 
-        print("SpecVLM:", sum(results['specvlm_decode'])/len(results['specvlm_decode']))
-        print("SpecVLM Average Accept Length:", (sum(results['specvlm_accept_length'])/len(results['specvlm_accept_length'])).item())
-        print("\n")
+        print("LVSpec:", sum(results['lvspec2_chain_decode'])/len(results['lvspec2_chain_decode']))
+        print("LVSpec Average Accept Length:", (sum(results['lvspec2_chain_accept_length'])/len(results['lvspec2_chain_accept_length'])).item())
+        print("LVSpec Generate Len:", (sum(results['lvspec2_chain_len'])/len(results['lvspec2_chain_len'])))
+        print("LVSpec token/s:", (sum(results['lvspec2_chain_len'])/sum(results['lvspec2_chain_decode'])))
         
         print("-------End-------")
+        
+        # Write to jsonl file if evaluation_num > 1
+        if evaluation_num > 1:
+            metrics = {
+            "Autoregressive Decoding Time": {
+                "Decoding Time": float(sum(results['ar_two_stage_decode'])/len(results['ar_two_stage_decode'])),
+                "Generate Length": float(sum(results['ar_two_stage_len'])/len(results['ar_two_stage_len'])),
+                "token/s": float(sum(results['ar_two_stage_len'])/sum(results['ar_two_stage_decode']))
+            },
 
-        metrics = {
-        "Autoregressive Decoding Time": float(sum(results['ar_two_stage_decode'])/len(results['ar_two_stage_decode'])),
-    
-        "Naive SD": {
-            "Decoding Time": float(sum(results['sd_tree_two_stage_decode'])/len(results['sd_tree_two_stage_decode'])),
-            "Average Accept Length": float(sum(results['sd_tree_two_stage_accept_length'])/len(results['sd_tree_two_stage_accept_length']))
-        },
-        
-        "specvlm": {
-            "Decoding Time": float(sum(results['specvlm_decode'])/len(results['specvlm_decode'])),
-            "Average Accept Length": float(sum(results['specvlm_accept_length'])/len(results['specvlm_accept_length']))
-        }
-        }
-        
-        # Write to jsonl file
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        with open(save_path, 'w') as f:
-            json_str = json.dumps(metrics, indent=4)
-            f.write(json_str + '\n\n')
+            "LVSpec": {
+                "Decoding Time": float(sum(results['lvspec2_chain_decode'])/len(results['lvspec2_chain_decode'])),
+                "Average Accept Length": float(sum(results['lvspec2_chain_accept_length'])/len(results['lvspec2_chain_accept_length'])),
+                "Generate Length": float(sum(results['lvspec2_chain_len'])/len(results['lvspec2_chain_len'])),
+                "token/s": float(sum(results['lvspec2_chain_len'])/sum(results['lvspec2_chain_decode']))
+            }
+
+            }
+            
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            with open(save_path, 'w') as f:
+                json_str = json.dumps(metrics, indent=4)
+                f.write(json_str + '\n\n')
 
 
 if __name__ == "__main__":
@@ -193,7 +186,6 @@ if __name__ == "__main__":
     
     # Load models
     model, draft_model, processor, video_token_id = load_model(args.model_type, args.base_model_path, args.draft_model_path)
-    #TODO: For 'self' setting, load draft model as base model
     
     # Load data
     data_video = load_data(args.task, args.data_num, args.data_path)

@@ -1613,6 +1613,8 @@ class Qwen2_5_VLCausalLMOutputWithPast(ModelOutput):
     hidden_states: Optional[Tuple[torch.FloatTensor]] = None
     attentions: Optional[Tuple[torch.FloatTensor]] = None
     rope_deltas: Optional[torch.LongTensor] = None
+    output_embeddings: Optional[torch.FloatTensor] = None #MODIFIED
+    video_hidden_states: Optional[Tuple[torch.FloatTensor]] = None #MODIFIED
 
 
 QWEN2_5_VL_INPUTS_DOCSTRING = r"""
@@ -2099,9 +2101,11 @@ class Qwen2_5_VLForConditionalGeneration(Qwen2_5_VLPreTrainedModel, GenerationMi
             loss=loss,
             logits=logits,
             past_key_values=outputs.past_key_values,
-            hidden_states=outputs.hidden_states,
+            hidden_states=hidden_states, # MODIFIED
             attentions=outputs.attentions,
             rope_deltas=self.rope_deltas,
+            output_embeddings=inputs_embeds,#MODIFIED
+            video_hidden_states=video_embeds if pixel_values_videos is not None else None, #MODIFIED
         )
 
     def prepare_inputs_for_generation(

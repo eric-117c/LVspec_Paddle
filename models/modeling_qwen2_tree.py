@@ -317,8 +317,6 @@ class Qwen2Attention(nn.Module):
         **kwargs: Unpack[FlashAttentionKwargs],
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
         
-        # torch.cuda.synchronize()
-        # time1 = time.time()
 
         input_shape = hidden_states.shape[:-1]
         bsz, q_len, _ = hidden_states.size()
@@ -340,9 +338,6 @@ class Qwen2Attention(nn.Module):
         # past_key_value is utilized to leverage previously computed key and value states.
         # If past_key_value is available, reuse the states for k, v, and self_attention.
 
-        # torch.cuda.synchronize()
-        # time2 = time.time()
-
 
         if past_key_value is not None:
             key_states = past_key_value[0].cat(key_states, dim=2)
@@ -350,8 +345,6 @@ class Qwen2Attention(nn.Module):
         # Reset past_key_value to avoid return past_key_value.
         past_key_value = None
 
-        # torch.cuda.synchronize()
-        # time3 = time.time()
 
 
         sliding_window = None
@@ -391,18 +384,9 @@ class Qwen2Attention(nn.Module):
         **kwargs,
         )
 
-        # torch.cuda.synchronize()
-        # time4 = time.time()
 
         attn_output = attn_output.reshape(*input_shape, -1).contiguous()
         attn_output = self.o_proj(attn_output)
-
-        # torch.cuda.synchronize()
-        # time5 = time.time()
-        # print("2-1:",time2-time1)
-        # print("3-2:",time3-time2)
-        # print("4-3:",time4-time3)
-        # print("5-4:",time5-time4)
 
         return attn_output, attn_weights
 
@@ -1141,7 +1125,7 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel, GenerationMixin):
             loss=loss,
             logits=logits,
             past_key_values=outputs.past_key_values,
-            hidden_states=outputs.hidden_states,
+            hidden_states=hidden_states, #MODIFIED
             attentions=outputs.attentions,
         )
 

@@ -12,6 +12,9 @@ from kv_cache.kv_cache import initialize_past_key_values
 from utils.utils_c import generate_tree_buffers_draft
 from tree_choices.choices import mc_sim_7b_63
 from utils.utils import *
+from .loose_match import * #MODIFIED
+
+import time
 
 
 DEPTH = 5
@@ -205,6 +208,7 @@ def generate_tree_buffers(tree_choices, device="cuda"):
 
 @torch.no_grad()
 def tree_draft(input_ids, draft_model, draft_past_key_values,len_posi):
+
     # input_ids = input_ids[:, 1:]
     input_ids = input_ids.to(draft_model.device)
     ss_token,ss_prob,ss_op = [],[],[]
@@ -244,6 +248,7 @@ def tree_draft(input_ids, draft_model, draft_past_key_values,len_posi):
     ss_token.append(topk_index)
     ss_prob.append(topk_prob)
     ss_op.append(op)
+
 
     # return (torch.cat(ss_token),torch.cat(ss_prob),ss_op)
     return torch.cat(ss_token).view(-1)
@@ -285,6 +290,24 @@ def initialize_tree(inputs, model, draft_model, past_key_values, draft_past_key_
     )
     return sample_token
 
+def initialize_tree_one_stage(inputs, model, draft_model, past_key_values, draft_past_key_values,
+                              method=None, video_token_id=151647, drop_rate=None):
+
+    #First stage of prefilling video tokens
+    output = model(
+        **inputs, past_key_values=past_key_values
+    )
+
+    logits = output.logits
+    sample_token = torch.argmax(logits[:, -1])
+    sample_token = sample_token[None, None]
+
+    #Prefill of Draft Model
+    output_draft = draft_model(
+        **inputs, past_key_values=draft_past_key_values
+    )
+    return sample_token
+
 
 
 
@@ -305,8 +328,8 @@ def initialize_tree_with_pruning(inputs, model, draft_model, past_key_values, dr
     output1 = model(
         **inputs, past_key_values=past_key_values
     )
-    # video_emb = output1.output_embeddings
-    # video_features = output1.video_hidden_states
+    video_features = output1.video_hidden_states # [visual_seq_len, 3584]
+    last_hidden_states = output1.hidden_states
 
     #Second stage of prefilling text tokens
     output2 = model(
@@ -315,10 +338,11 @@ def initialize_tree_with_pruning(inputs, model, draft_model, past_key_values, dr
         output_attentions=True,
     )
     logits = output2.logits
-    attentions = output2.attentions
+    attentions = output2.attentions # [num_layers, batch_size, num_heads, seq_len_q, seq_len_k]
     # text_emb = output2.output_embeddings
     sample_token = torch.argmax(logits[:, -1])
     sample_token = sample_token[None, None]
+
 
     #Prefill of Draft Model
     inputs['input_ids'] = torch.cat([inputs['input_ids'], text_input_ids], dim=1)
@@ -337,9 +361,12 @@ def initialize_tree_with_pruning(inputs, model, draft_model, past_key_values, dr
     # elif method == 'attention_two_stage_reverse':
     #     inputs_drop = drop_visual_tokens_by_attention(attentions, inputs, drop_rate=drop_rate,
     #                                 visual_token_id=video_token_id, reverse=True, idx=idx)
-    if method == 'specvlm':
-        inputs_drop = drop_visual_tokens_specvlm(attentions, inputs, drop_rate=drop_rate,
-                                    visual_token_id=video_token_id, idx=idx, threshold=threshold, percentage=percentage)
+    if method == 'uniform':
+        inputs_drop = drop_visual_tokens_uniform(inputs, drop_rate=drop_rate,
+                                    visual_token_id=video_token_id)
+    # if method == 'specvlm':
+    #     inputs_drop = drop_visual_tokens_specvlm(attentions, inputs, drop_rate=drop_rate,
+    #                                 visual_token_id=video_token_id, idx=idx, threshold=threshold, percentage=percentage)
     else:
         print("Method not supported")
 
@@ -352,7 +379,61 @@ def initialize_tree_with_pruning(inputs, model, draft_model, past_key_values, dr
     print("Target KV:",past_key_values[0][0].shape)
     print("Draft KV:",draft_past_key_values[0][0].shape)
 
-    return sample_token, input_ids, draft_input_len, scores
+    return sample_token, input_ids, draft_input_len, scores, select_video_features, select_last_hidden_states #MODIFIED
+
+
+def initialize_tree_with_pruning_one_stage(inputs, model, draft_model, past_key_values, draft_past_key_values,
+                              method=None, video_token_id=151647, drop_rate=None, idx=None, inputs_drop=None, threshold=None, percentage=None, similarity_threshold=0.95):
+
+    input_ids = inputs['input_ids'].clone()
+    #First stage of prefilling video tokens
+    output = model(
+        **inputs, past_key_values=past_key_values
+    )
+    # video_emb = output.output_embeddings # [1,seq_len, 3584]
+    video_features = output.video_hidden_states # [seq_len, 3584]
+    last_hidden_states = output.hidden_states
+
+    logits = output.logits
+    sample_token = torch.argmax(logits[:, -1])
+    sample_token = sample_token[None, None]
+
+    #Prefill of Draft Model
+
+    torch.cuda.synchronize()
+
+    scores = None
+    #pruning draft kv cache
+        
+    if method == 'uniform':
+        inputs_drop = drop_visual_tokens_uniform(inputs, drop_rate=drop_rate,
+                                    visual_token_id=video_token_id)
+    # if method == 'specvlm':
+    #     inputs_drop = drop_visual_tokens_specvlm(attentions, inputs, drop_rate=drop_rate,
+    #                                 visual_token_id=video_token_id, idx=idx, threshold=threshold, percentage=percentage)
+    else:
+        print("Method not supported")
+
+    torch.cuda.synchronize()
+
+
+    draft_input_len = inputs_drop['input_ids'].shape[1]
+    # print("draft_input_len:",draft_input_len)
+
+    torch.cuda.synchronize()
+    draft_start = time.time()
+
+    #Prefill of Draft Model
+    output_draft = draft_model(
+        **inputs_drop, past_key_values=draft_past_key_values
+    )
+    torch.cuda.synchronize()
+    draft_end = time.time()
+
+    print("INFO: Target Model KV:",past_key_values[0][0].shape)
+    print("INFO: Draft Model KV:",draft_past_key_values[0][0].shape)
+
+    return sample_token, input_ids, draft_input_len, scores, video_features, last_hidden_states
 
 
 
@@ -387,7 +468,8 @@ def tree_decoding(
         tree_position_ids,
         input_ids,
         retrieve_indices,
-):
+):  
+
     position_ids = tree_position_ids + input_ids.shape[1]
 
     outputs = model.model(
@@ -397,21 +479,121 @@ def tree_decoding(
     )
     tree_logits = model.lm_head(outputs[0]) #[1,26,152128]
     logits = tree_logits[0, retrieve_indices.to(tree_logits.device)] #[15,6,152128]
-    return logits, outputs
+
+    tree_hidden_states = outputs[0][0,retrieve_indices.to(outputs[0].device)] #[15,6,3584]
+
+    return logits, outputs, tree_hidden_states # MODIFIED
 
 
+# MODIFIED
+import math
+import torch.nn.functional as F
+
+def visual_similarity_hidden_state(
+    last_hidden_states: torch.Tensor,   # [1, L_vis, D]
+    tree_hidden_states: torch.Tensor,   # [B, L_tree, D]
+    topk: int = 10,
+) -> torch.Tensor:
+    if last_hidden_states.dim() == 3 and last_hidden_states.size(0) == 1:
+        visual = last_hidden_states[0]          # [L_vis, D]
+    elif last_hidden_states.dim() == 2:
+        visual = last_hidden_states             # [L_vis, D]
+    else:
+        raise ValueError(f"Unexpected shape for last_hidden_states: {last_hidden_states.shape}")
+
+    # tree_hidden_states: [B, L_tree, D]
+    tree = tree_hidden_states.to(dtype=torch.float32)
+    visual = visual.to(tree.device, dtype=torch.float32)
+
+    # L2 normalize
+    tree_norm = F.normalize(tree, dim=-1)       # [B, L_tree, D]
+    visual_norm = F.normalize(visual, dim=-1)   # [L_vis, D]
+
+    sims = torch.einsum("bld,vd->blv", tree_norm, visual_norm)
+
+    num_visual = sims.size(-1)
+    k = min(topk, num_visual)
+    topk_vals, _ = sims.topk(k, dim=-1)         # [B, L_tree, k]
+
+    scores = topk_vals.mean(dim=-1)
+
+    return scores
 
 
+    
 def evaluate_posterior(
-        logits: torch.Tensor,
-        candidates: torch.Tensor,
-):
-    # Greedy decoding based on temperature value
+        logits: torch.Tensor, #[15,6,152128]
+        candidates: torch.Tensor, #[15,6]
+        processor = None,
+        model = None, #MODIFIED
+        loose='no',
+        loose_window=2,
+        loose_random = 0.5,
+        loose_entropy=0.1,
+        loose_hidden_score=0.5,
+        loose_hidden_k=3,
+        loose_rank=0.5,
+        video_emb = None, #MODIFIED #[1, seq_len, 3584]
+        last_hidden_states = None, #MODIFIED #[1, seq_len, 3584]
+        tree_hidden_states = None, #MODIFIED #[B, tree_len, 3584]
+        visual_codebook = None, #MODIFIED
+        visual_score_list = None, #MODIFIED
+):  
+    # print("Candidates:",candidates.shape)
+    # print("Logits:",logits.shape)
+    if loose:
+
+        # print("Probs:", [f"{p:.2f}" for p in torch.softmax(logits, dim=-1)[0, torch.arange(logits.shape[1]), torch.argmax(logits, dim=-1)[0]].tolist()])
+        probs_all = torch.softmax(logits.float(), dim=-1) # [B, T, V]
+        V = probs_all.size(-1)
+        p = probs_all + 1e-12
+        entropies = -(p * p.log()).sum(dim=-1) / math.log(V)   # [B, T]
+        # print("Entropy:", [[f"{h:.2f}" for h in row] for row in entropies.tolist()])
+
+        tree_vis_scores = None
+        if loose == 'hidden' or loose == 'hidden_topk' or loose == 'hidden_topk_or_codebook' or loose == 'hidden_topk_or_search' or loose == 'global_hidden':
+            if (last_hidden_states is not None) and (tree_hidden_states is not None):
+                tree_vis_scores = visual_similarity_hidden_state(
+                    last_hidden_states=last_hidden_states,
+                    tree_hidden_states=tree_hidden_states[:,:-1], #MODIFIED
+                    topk=10,
+                )  # [B, L_tree]
+                print("hidden:", [[f"{v:.2f}" for v in row] for row in tree_vis_scores.tolist()])
+
     # Find the tokens that match the maximum logits for each position in the sequence
     posterior_mask = (
             candidates[:, 1:].to(logits.device) == torch.argmax(logits[:, :-1], dim=-1)
     ).int()
-    candidates_accept_length = (torch.cumprod(posterior_mask, dim=1)).sum(dim=1)
+    if loose == 'no':
+        candidates_accept_length = (torch.cumprod(posterior_mask, dim=1)).sum(dim=1)
+    elif loose == 'window':
+        candidates_accept_length = loose_match_window(posterior_mask, loose_window=loose_window)
+    elif loose == 'random':
+        candidates_accept_length = loose_match_random(posterior_mask, accept_prob=loose_random)
+    elif loose == 'entropy':
+        candidates_accept_length = loose_match_entropy(
+            posterior_mask,
+            entropies,          
+            entropy_threshold=loose_entropy,
+        )
+    elif loose == 'window_and_entropy':
+        candidates_accept_length = loose_match_window_and_entropy(
+            posterior_mask=posterior_mask,  # [B, T-1]
+            entropies=entropies,            # [B, T-1]
+            entropy_threshold=loose_entropy,
+            loose_window=loose_window,
+        )
+    elif loose == 'hidden_topk_or_search':
+        logits_prefix = logits[:, :-1, :]
+        candidates_accept_length = loose_match_hidden_topk_or_search(
+            posterior_mask=posterior_mask,   # [B, T_match]
+            vis_scores=tree_vis_scores,      # [B, T_match
+            candidates=candidates,           # [B, T_cand]
+            logits=logits_prefix,        
+            k=loose_hidden_k,                
+        )
+    else:
+        raise ValueError(f"Unknown loose mode: {loose}")
     accept_length = candidates_accept_length.max()
     # Choose the best candidate
     if accept_length == 0:
@@ -419,8 +601,11 @@ def evaluate_posterior(
         best_candidate = torch.tensor(0, dtype=torch.long, device=candidates.device)
     else:
         best_candidate = torch.argmax(candidates_accept_length).to(torch.long)
-    return best_candidate, accept_length, logits[best_candidate, accept_length]
-    
+        
+    # print("Best Candidate: ", logits[best_candidate, accept_length].shape)
+    # print("Accepet to:", processor.decode(torch.argmax(logits[best_candidate, accept_length]), skip_special_tokens=False))
+
+    return best_candidate, accept_length, logits[best_candidate, accept_length], tree_vis_scores #MODIFIED
 
 
 
@@ -569,6 +754,8 @@ def SD_generate(
         video_token_id=151656,
         log=False,
         tree_choices=mc_sim_7b_63,
+        loose='no',
+        loose_window=2,
     ):
         torch.cuda.synchronize()
         infer_start = time.time()
@@ -605,13 +792,14 @@ def SD_generate(
         input_ids = inputs['input_ids']
         input_ids = input_ids.clone()
         input_len = input_ids.shape[1]
+        original_input_len = input_len
 
         #Init
         reset_tree_mode(model)
         reset_tree_mode(draft_model)
 
         #Prefill
-        sample_token = initialize_tree(
+        sample_token = initialize_tree_one_stage(
             inputs, model, draft_model, past_key_values, draft_past_key_values,
             video_token_id=video_token_id
         )
@@ -638,7 +826,7 @@ def SD_generate(
                 processor,
             )
 
-            logits, outputs = tree_decoding(
+            logits, outputs, _ = tree_decoding(
                 model,
                 tree_candidates,
                 past_key_values,
@@ -647,8 +835,8 @@ def SD_generate(
                 tree_buffers["retrieve_indices"],
                 )
             
-            best_candidate, accept_length, sample_p = evaluate_posterior(
-                    logits, candidates
+            best_candidate, accept_length, sample_p, tree_vis_scores = evaluate_posterior(
+                    logits, candidates, processor, model, loose=loose, loose_window=loose_window
                 )
             accept_length_total.append(accept_length)
 
@@ -693,7 +881,28 @@ def SD_generate(
                     'inference_time': end - infer_start,
                     'decoding_time': end - decode_start,
                     'mean_accept_length': sum(accept_length_total) / len(accept_length_total),
+                    'generate_len': new_token,
                 }
+            if processor.tokenizer.eos_token_id in input_ids[0, original_input_len:].tolist():
+                reset_tree_mode(model)
+                reset_tree_mode(draft_model)
+                torch.cuda.synchronize()
+                end = time.time()
+
+                eos_token_id = processor.tokenizer.eos_token_id
+                eos_position = (input_ids[0, original_input_len:] == eos_token_id).nonzero(as_tuple=True)
+                eos_position = eos_position[0][0].item() + original_input_len
+                generate_len = eos_position - original_input_len
+                input_ids = input_ids[:, :eos_position]
+
+                return {
+                    'output_ids': input_ids,
+                    'inference_time': end - infer_start,
+                    'decoding_time': end - decode_start,
+                    'mean_accept_length': sum(accept_length_total) / len(accept_length_total),
+                    'generate_len': generate_len,
+                }
+
 
 
 
@@ -714,6 +923,10 @@ def SD_generate_with_pruning(
         threshold=None,
         percentage=None,
         similarity_threshold=0.95,
+        loose='no',
+        loose_window=2,
+        loose_random=0.5,
+        loose_entropy=0.1
     ):
         torch.cuda.synchronize()
         infer_start = time.time()
@@ -753,7 +966,8 @@ def SD_generate_with_pruning(
         reset_tree_mode(draft_model)
 
         scores = None
-        sample_token, input_ids, draft_input_len, scores = initialize_tree_with_pruning(
+        # MODIFIED
+        sample_token, input_ids, draft_input_len, scores, video_emb, last_hidden_states = initialize_tree_with_pruning_one_stage(
             inputs, model, draft_model, past_key_values, draft_past_key_values,
             method, video_token_id, drop_rate, idx=idx, inputs_drop=inputs_drop,
             threshold=threshold, percentage=percentage,similarity_threshold=similarity_threshold,
@@ -762,6 +976,11 @@ def SD_generate_with_pruning(
 
         input_ids = input_ids.clone()
         input_len = input_ids.shape[1]
+        original_input_len = input_len
+
+        #MODIFIED
+        visual_codebook = set()
+        visual_score_list = []
 
 
         torch.cuda.synchronize()
@@ -770,8 +989,10 @@ def SD_generate_with_pruning(
         first_id = sample_token.to(input_ids.device)
         len_posi = draft_input_len + 1
         # len_posi = inputs['input_ids'].shape[1] + 1
+
         tree_logits = tree_draft(first_id, draft_model, draft_past_key_values, len_posi)
         model.model.tree_mask = tree_buffers["tree_attn_mask"]
+
 
 
         new_token = 0
@@ -785,7 +1006,7 @@ def SD_generate_with_pruning(
                 processor,
             )
 
-            logits, outputs = tree_decoding(
+            logits, outputs, tree_hidden_states = tree_decoding( #MODIFIED
                 model,
                 tree_candidates,
                 past_key_values,
@@ -794,8 +1015,8 @@ def SD_generate_with_pruning(
                 tree_buffers["retrieve_indices"],
                 )
             
-            best_candidate, accept_length, sample_p = evaluate_posterior(
-                    logits, candidates
+            best_candidate, accept_length, sample_p, tree_vis_scores = evaluate_posterior(
+                    logits, candidates, processor, model, loose=loose, loose_window=loose_window,loose_random=loose_random, loose_entropy=loose_entropy, video_emb=video_emb, last_hidden_states=last_hidden_states, tree_hidden_states=tree_hidden_states, visual_codebook=visual_codebook, visual_score_list=visual_score_list
                 )
             accept_length_total.append(accept_length)
 
@@ -817,6 +1038,9 @@ def SD_generate_with_pruning(
                 sample_p,
                 draft_input_len
             )
+
+            if tree_vis_scores is not None:
+                visual_score_list.extend(tree_vis_scores.reshape(-1).tolist())
 
             # if processor.tokenizer.eos_token_id in input_ids[0, input_len:].tolist():
             #     reset_tree_mode(model)
@@ -842,12 +1066,34 @@ def SD_generate_with_pruning(
                     'decoding_time': end - decode_start,
                     'mean_accept_length': sum(accept_length_total) / len(accept_length_total),
                     'scores': scores,
+                    'generate_len': new_token,
+                }
+
+            if processor.tokenizer.eos_token_id in input_ids[0, original_input_len:].tolist():
+                reset_tree_mode(model)
+                reset_tree_mode(draft_model)
+                torch.cuda.synchronize()
+                end = time.time()
+
+                eos_token_id = processor.tokenizer.eos_token_id
+                eos_position = (input_ids[0, original_input_len:] == eos_token_id).nonzero(as_tuple=True)
+                eos_position = eos_position[0][0].item() + original_input_len
+                generate_len = eos_position - original_input_len
+                input_ids = input_ids[:, :eos_position]
+
+                return {
+                    'output_ids': input_ids,
+                    'inference_time': end - infer_start,
+                    'decoding_time': end - decode_start,
+                    'mean_accept_length': sum(accept_length_total) / len(accept_length_total),
+                    'scores': scores,
+                    'generate_len': generate_len,
                 }
             
 
 
 @torch.no_grad()
-def AR_generate(inputs, model, max_new_tokens=100,video_token_id=151656):
+def AR_generate(inputs, model, max_new_tokens=100,video_token_id=151656, processor=None):
     torch.cuda.synchronize()
     tic1 = time.time()
 
@@ -899,7 +1145,9 @@ def AR_generate(inputs, model, max_new_tokens=100,video_token_id=151656):
         torch.cuda.synchronize()
         tic2 = time.time()
         
+        generate_len = 1
         for step in range(max_new_tokens - 1):
+            generate_len += 1
             new_inputs = {
                 'input_ids': next_token,
                 'past_key_values': past_key_values,
@@ -909,6 +1157,10 @@ def AR_generate(inputs, model, max_new_tokens=100,video_token_id=151656):
             next_token = torch.argmax(outputs.logits[:, -1:], dim=-1)
             generated = torch.cat([generated, next_token], dim=-1)
 
+            if processor.tokenizer.eos_token_id == next_token.item():
+                print("Generation finished as EOS token is generated.")
+                break
+
         torch.cuda.synchronize()
         toc = time.time()
         
@@ -916,7 +1168,129 @@ def AR_generate(inputs, model, max_new_tokens=100,video_token_id=151656):
         'output_ids':generated,
         'inference_time':toc - tic1,
         'decoding_time':toc - tic2,
+        'generate_len':generate_len,
     }
 
 
+# One Stage
+@torch.no_grad()
+def AR_generate_one_stage(inputs, model, max_new_tokens=100,video_token_id=151647,processor=None):
+    torch.cuda.synchronize()
+    tic1 = time.time()
+
+    (
+        past_key_values,
+        past_key_values_data,
+        current_length_data,
+    ) = initialize_past_key_values(model)
+    model.model.past_key_values = past_key_values
+    model.model.past_key_values_data = past_key_values_data
+    model.model.current_length_data = current_length_data
+
+    model.model.tree_mask = None 
+    
+    with torch.no_grad():
+        #First stage of prefilling video tokens
+        output = model(
+            **inputs, past_key_values=past_key_values
+        )
+        logits = output.logits
+        next_token = torch.argmax(logits[:, -1])
+        next_token = next_token[None, None]
+
+        generated = torch.cat([inputs['input_ids'], next_token], dim=1)
+
+        torch.cuda.synchronize()
+        tic2 = time.time()
+        
+        generate_len = 0
+        for step in range(max_new_tokens - 1):
+            generate_len += 1
+            new_inputs = {
+                'input_ids': next_token,
+                'past_key_values': past_key_values
+            }
+            outputs = model(**new_inputs)
+            
+            next_token = torch.argmax(outputs.logits[:, -1:], dim=-1)
+            generated = torch.cat([generated, next_token], dim=-1)
+
+            # print("next token:",next_token.item())
+            # print("Prossor eos id:",processor.tokenizer.eos_token_id)
+            if processor.tokenizer.eos_token_id == next_token.item():
+                print("Generation finished as EOS token is generated.")
+                break
+        torch.cuda.synchronize()
+        toc = time.time()
+        
+        return {
+        'output_ids':generated,
+        'inference_time':toc - tic1,
+        'decoding_time':toc - tic2,
+        'generate_len':generate_len,
+    }
+
+
+
+# One Stage
+@torch.no_grad()
+def AR_generate_random(inputs, model, max_new_tokens=100,video_token_id=151647,processor=None, drop_rate=0.9):
+    torch.cuda.synchronize()
+    tic1 = time.time()
+
+    (
+        past_key_values,
+        past_key_values_data,
+        current_length_data,
+    ) = initialize_past_key_values(model)
+    model.model.past_key_values = past_key_values
+    model.model.past_key_values_data = past_key_values_data
+    model.model.current_length_data = current_length_data
+
+    model.model.tree_mask = None 
+    
+    with torch.no_grad():
+        input_ids = inputs['input_ids'].clone()
+        inputs_drop = drop_visual_tokens_random(inputs, drop_rate=drop_rate,
+                                    visual_token_id=video_token_id)
+        #First stage of prefilling video tokens
+        output = model(
+            **inputs_drop, past_key_values=past_key_values
+        )
+        print("Input length:",inputs_drop['input_ids'].shape[1])
+        logits = output.logits
+        next_token = torch.argmax(logits[:, -1])
+        next_token = next_token[None, None]
+
+        generated = torch.cat([input_ids, next_token], dim=1)
+
+        torch.cuda.synchronize()
+        tic2 = time.time()
+        
+        generate_len = 0
+        for step in range(max_new_tokens - 1):
+            generate_len += 1
+            new_inputs = {
+                'input_ids': next_token,
+                'past_key_values': past_key_values
+            }
+            outputs = model(**new_inputs)
+            
+            next_token = torch.argmax(outputs.logits[:, -1:], dim=-1)
+            generated = torch.cat([generated, next_token], dim=-1)
+
+            # print("next token:",next_token.item())
+            # print("Prossor eos id:",processor.tokenizer.eos_token_id)
+            if processor.tokenizer.eos_token_id == next_token.item():
+                print("Generation finished as EOS token is generated.")
+                break
+        torch.cuda.synchronize()
+        toc = time.time()
+        
+        return {
+        'output_ids':generated,
+        'inference_time':toc - tic1,
+        'decoding_time':toc - tic2,
+        'generate_len':generate_len,
+    }
 
