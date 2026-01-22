@@ -1,3 +1,5 @@
+# See the Forest for the Trees: Loosely Speculative Decoding via Visual-Semantic Guidance for Efficient Inference of Video LLMs
+
 ## Quick Start
 
 ### 1. Install dependencies
