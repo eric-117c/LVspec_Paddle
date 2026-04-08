@@ -64,7 +64,7 @@ def _build_metric_record(method, decoding_times, generate_lens, accept_lengths=N
 
 
 
-def run_eval(model_type, model, draft_model, data_video, task, frame_num, evaluation_num, max_new_tokens, drop_rate, video_token_id, method, save_path=None, data_path=None, processor=None):
+def run_eval(model_type, model, draft_model, data_video, task, frame_num, evaluation_num, max_new_tokens, drop_rate, video_token_id, method, loose_hidden_k, save_path=None, data_path=None, processor=None):
     # Run evaluation
     model.eval()
     draft_model.eval()
@@ -96,6 +96,7 @@ def run_eval(model_type, model, draft_model, data_video, task, frame_num, evalua
                 "max_new_tokens": max_new_tokens,
                 "tree_choices": chain,
                 "loose": "hidden_topk",
+                "loose_hidden_k": loose_hidden_k,
             },
         },
         "lvspec_with_pst": {
@@ -108,6 +109,7 @@ def run_eval(model_type, model, draft_model, data_video, task, frame_num, evalua
                 "max_new_tokens": max_new_tokens,
                 "tree_choices": chain,
                 "loose": "hidden_topk_or_search",
+                "loose_hidden_k": loose_hidden_k,
             },
         },
     }
@@ -237,6 +239,8 @@ if __name__ == "__main__":
     parser.add_argument('--method', type=str, default='ar',
                         choices=['ar', 'specvlm_uniform', 'lvspec', 'lvspec_with_pst'],
                         help='Method to run')
+    parser.add_argument('--loose_hidden_k', type=int, default=7,
+                        help='Top-k threshold for loose hidden matching')
     parser.add_argument('--gpu_ids', type=str, default="0,1,2,3,4,5",
                         help='GPU IDs to use')
     parser.add_argument('--setting', type=str, default='standard',
@@ -281,6 +285,7 @@ if __name__ == "__main__":
         drop_rate=args.drop_rate,
         video_token_id=video_token_id,
         method=args.method,
+        loose_hidden_k=args.loose_hidden_k,
         save_path=save_path,
         data_path=args.data_path,
         processor=processor,

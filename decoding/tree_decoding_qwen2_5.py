@@ -930,7 +930,8 @@ def SD_generate_with_pruning(
         loose='no',
         loose_window=2,
         loose_random=0.5,
-        loose_entropy=0.1
+        loose_entropy=0.1,
+        loose_hidden_k=7
     ):
         torch.cuda.synchronize()
         infer_start = time.time()
@@ -1020,7 +1021,7 @@ def SD_generate_with_pruning(
                 )
             
             best_candidate, accept_length, sample_p, tree_vis_scores = evaluate_posterior(
-                    logits, candidates, processor, model, loose=loose, loose_window=loose_window,loose_random=loose_random, loose_entropy=loose_entropy, video_emb=video_emb, last_hidden_states=last_hidden_states, tree_hidden_states=tree_hidden_states, visual_codebook=visual_codebook, visual_score_list=visual_score_list
+                    logits, candidates, processor, model, loose=loose, loose_window=loose_window,loose_random=loose_random, loose_entropy=loose_entropy, loose_hidden_k=loose_hidden_k, video_emb=video_emb, last_hidden_states=last_hidden_states, tree_hidden_states=tree_hidden_states, visual_codebook=visual_codebook, visual_score_list=visual_score_list
                 )
             accept_length_total.append(accept_length)
 
@@ -1297,4 +1298,3 @@ def AR_generate_random(inputs, model, max_new_tokens=100,video_token_id=151647,p
         'decoding_time':toc - tic2,
         'generate_len':generate_len,
     }
-

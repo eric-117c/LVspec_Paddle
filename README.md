@@ -47,7 +47,7 @@ Video Large Language Models (Video-LLMs) excel in video understanding but suffer
 
 ## 📌  Method
 <p align="center">
-  <img src="assets/method.png" alt="LVSpec Framework" width="100%"/>
+  <img src="assets/method.png" alt="LVSpec Framework" width="80%"/>
 </p>
 
 
@@ -96,12 +96,12 @@ git clone https://github.com/EvolvingLMMs-Lab/lmms-eval.git
 
 1. Put the file `evaluation/llava_onevision_lvspec.py` and `evaluation/qwen2_5_vl_lvspec.py` under `lmms-eval/lmms_eval/models/` and modify `lmms-eval/lmms_eval/models/__init__.py` to register. Also put the two `.sh` file under `lmms-eval/examples/models`.
 
-2. To make sure the LVSpec repo is accessible in the two files, you can clone the LVSpec repo to `lmms-eval/lmms_eval`.
+2. To make sure the LVSpec repository is accessible in lmm-eval, you can clone the LVSpec repo to `lmms-eval/lmms_eval`.
 
-3. Modify the corresponding config in `/lmms-eval/lmms_eval/tasks`. Launch the LLM judge as in `LVSpec/evaluation/sglang.sh`.
+3. Modify the corresponding configs in `/lmms-eval/lmms_eval/tasks`. Then launch the LLM judge as in `LVSpec/evaluation/sglang.sh`.
 
 ```bash
-# Under lmm-eval
+# In lmm-eval
 # llava-onevision
 bash examples/models/llava_onevision_specvlm.sh
 
@@ -113,12 +113,17 @@ After running, both the performance metric and efficiency metric will be recorde
 We recommand using `quick inference` for quick testing, and using `benchmark evaluation` to reproduce the results in the paper. Because running within lmm-eval enables support for vLLM, standard benchmark configurations, and qwen-vl-utils.
 
 
+## 🛩️ Future Work
+- [ ] Release more evaluation scripts and benchmark configs.
+- [ ] Support more Video-LLM backbones and inference settings.
+- [ ] Extend LVSpec to more challenging long-video understanding tasks.
+
 
 
 ## Note
 - Our method primarily targets resource-constrained long-video scenarios, where GPU memory bandwidth constitutes the main bottleneck during inference. Hence, the speedup ratio is sensitive to hardware settings.
 Users are advised to set the input length according to GPU capacity. Theoretically, as frame number grows, SpecVLM and LVSpec achieve higher acceleration ratios.
-- Our LVSpec is built upon the repository of [SpecVLM](https://github.com/zju-jiyicheng/SpecVLM). To study the effect of vision-aware verification independently, we apply simple uniform visual token pruning.
+- Our LVSpec is built upon the repository of [SpecVLM](https://github.com/zju-jiyicheng/SpecVLM). To focus on studying the effect of vision-aware verification, we apply simple uniform visual token pruning.
 
 ## Citation
 If you find our work useful or relevant to your research, please kindly cite our papers:

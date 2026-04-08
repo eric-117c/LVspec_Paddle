@@ -2,8 +2,5 @@ transformers==4.48.0
 datasets
 accelerate
 numpy
-qwen-vl-utils
-av
-sentencepiece
-protobuf
-pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0
+qwen-vl-utils==0.0.10 
+av==14.0.0

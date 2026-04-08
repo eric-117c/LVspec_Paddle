@@ -14,6 +14,7 @@ DROP_RATE=0.9                    # Pruning ratio
 GPU_IDS="0,1"                    # GPU IDs to use
 
 METHOD="lvspec"                  # [ar, specvlm_uniform, lvspec, lvspec_with_pst]
+LOOSE_HIDDEN_K=7                 # Loose parameter for relaxed verification
 
 FRAME_NUM=64      
 
@@ -31,5 +32,6 @@ CUDA_VISIBLE_DEVICES=$GPU_IDS python inference.py \
     --data_num $DATA_NUM \
     --gpu_ids $GPU_IDS \
     --method $METHOD \
+    --loose_hidden_k $LOOSE_HIDDEN_K \
     --save_path "results/{$MODEL_TYPE}_{$METHOD}_drop{$DROP_RATE}_frame{$FRAME_NUM}" \
     # --setting "standard" \
