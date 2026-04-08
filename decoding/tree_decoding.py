@@ -568,7 +568,7 @@ def evaluate_posterior(
         loose_random = 0.5,
         loose_entropy=0.1,
         loose_hidden_score=0.5,
-        loose_hidden_k=10,
+        loose_hidden_k=7,
         loose_rank=0.5,
         video_emb = None, #MODIFIED #[1, seq_len, 3584]
         last_hidden_states = None, #MODIFIED #[1, seq_len, 3584]
@@ -579,30 +579,28 @@ def evaluate_posterior(
     # print("Candidates:",candidates.shape)
     # print("Logits:",logits.shape)
     if loose:
-        print("--------")
+        # print("--------")
         # print("Draft:",processor.decode(candidates[0, 1:], skip_special_tokens=False))
         # print("Target:",processor.decode(torch.argmax(logits, dim=-1)[0], skip_special_tokens=False))
         draft_ids = candidates[0, 1:].tolist()  # [seq_len]
         target_ids = torch.argmax(logits, dim=-1)[0].tolist()  # [seq_len]
 
 
-        print("Probs:", [f"{p:.2f}" for p in torch.softmax(logits, dim=-1)[0, torch.arange(logits.shape[1]), torch.argmax(logits, dim=-1)[0]].tolist()])
         probs_all = torch.softmax(logits.float(), dim=-1) # [B, T, V]
         V = probs_all.size(-1)
         p = probs_all + 1e-12
         entropies = -(p * p.log()).sum(dim=-1) / math.log(V)   # [B, T]
-        print("Entropy:", [[f"{h:.2f}" for h in row] for row in entropies.tolist()])
 
 
         tree_vis_scores = None
-        if loose == 'hidden' or loose == 'hidden_topk' or loose == 'hidden_topk_or_codebook' or loose == 'hidden_topk_or_search' or loose == 'global_hidden':
+        if loose == 'hidden' or loose == 'hidden_topk' or loose == 'hidden_topk_or_search':
             if (last_hidden_states is not None) and (tree_hidden_states is not None):
                 tree_vis_scores = visual_similarity_hidden_state(
                     last_hidden_states=last_hidden_states,
                     tree_hidden_states=tree_hidden_states[:,:-1], #MODIFIED
                     topk=10,
                 )  # [B, L_tree]
-                print("hidden:", [[f"{v:.2f}" for v in row] for row in tree_vis_scores.tolist()])
+                # print("hidden:", [[f"{v:.2f}" for v in row] for row in tree_vis_scores.tolist()])
 
             
 
@@ -629,6 +627,13 @@ def evaluate_posterior(
             entropies=entropies,            # [B, T-1]
             entropy_threshold=loose_entropy,
             loose_window=loose_window,
+        )
+    elif loose == 'hidden_topk':
+        logits_prefix = logits[:, :-1, :]
+        candidates_accept_length = loose_match_hidden_topk(
+            posterior_mask=posterior_mask,   # [B, T_match]
+            vis_scores=tree_vis_scores,      # [B, T_match]
+            k=loose_hidden_k,                #
         )
     elif loose == 'hidden_topk_or_search':
         logits_prefix = logits[:, :-1, :]
@@ -699,7 +704,6 @@ def update_inference_inputs(
     del_len = 1
     for i in draft_model.language_model.tree_buffer['tree_indices']:
         del_len += len(i)
-    # print("del_len:",del_len)
     for draft_past_key_values_data in draft_past_key_values_data_list:
         draft_past_key_values_data = draft_past_key_values_data[..., :-del_len, :]
     draft_current_length_data.fill_(prev_input_len)
@@ -906,19 +910,7 @@ def SD_generate(
                 sample_p
             )
 
-            # if processor.tokenizer.eos_token_id in input_ids[0, input_len:].tolist():
-            #     reset_tree_mode(model)
-            #     reset_tree_mode(draft_model)
-            #     torch.cuda.synchronize()
-            #     end = time.time()
-            #     return {
-            #         'output_ids': input_ids,
-            #         'inference_time': end - infer_start,
-            #         'decoding_time': end - decode_start,
-            #         'mean_accept_length': sum(accept_length_total) / len(accept_length_total),
-            #     }
 
-            # Currently, we mannually set the generation length for fair comparison.
             if new_token >= max_new_tokens:
                 reset_tree_mode(model)
                 reset_tree_mode(draft_model)

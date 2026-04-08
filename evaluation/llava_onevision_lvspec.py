@@ -26,16 +26,11 @@ from lmms_eval.models.model_utils.load_video import read_video_pyav
 
 from PIL import Image
 
-# SpecVLM imports
-from lmms_eval.SpecVLM.models.modeling_llava_onevision_tree import LlavaOnevisionForConditionalGeneration
-from lmms_eval.SpecVLM.decoding.tree_decoding import *
-from lmms_eval.SpecVLM.tree_choices.choices import mc_sim_7b_63, chain, chain_15, chain2_8, chain2_10
-
-# from transformers import (
-#     AutoProcessor,
-#     AutoTokenizer,
-# )
-from lmms_eval.SpecVLM.models.transformers_local.models.llava_onevision.processing_llava_onevision import LlavaOnevisionProcessor
+# LVSpec & SpecVLM imports
+from lmms_eval.LVSpec.models.modeling_llava_onevision_tree import LlavaOnevisionForConditionalGeneration
+from lmms_eval.LVSpec.decoding.tree_decoding import *
+from lmms_eval.LVSpec.tree_choices.choices import mc_sim_7b_63, chain, chain_15, chain2_8, chain2_10
+from lmms_eval.LVSpec.models.transformers_local.models.llava_onevision.processing_llava_onevision import LlavaOnevisionProcessor
 
 # Suppress warnings
 warnings.filterwarnings("ignore")

@@ -531,7 +531,7 @@ def evaluate_posterior(
         loose_random = 0.5,
         loose_entropy=0.1,
         loose_hidden_score=0.5,
-        loose_hidden_k=3,
+        loose_hidden_k=7,
         loose_rank=0.5,
         video_emb = None, #MODIFIED #[1, seq_len, 3584]
         last_hidden_states = None, #MODIFIED #[1, seq_len, 3584]
@@ -548,17 +548,16 @@ def evaluate_posterior(
         V = probs_all.size(-1)
         p = probs_all + 1e-12
         entropies = -(p * p.log()).sum(dim=-1) / math.log(V)   # [B, T]
-        # print("Entropy:", [[f"{h:.2f}" for h in row] for row in entropies.tolist()])
 
         tree_vis_scores = None
-        if loose == 'hidden' or loose == 'hidden_topk' or loose == 'hidden_topk_or_codebook' or loose == 'hidden_topk_or_search' or loose == 'global_hidden':
+        if loose == 'hidden' or loose == 'hidden_topk' or loose == 'hidden_topk_or_search':
             if (last_hidden_states is not None) and (tree_hidden_states is not None):
                 tree_vis_scores = visual_similarity_hidden_state(
                     last_hidden_states=last_hidden_states,
                     tree_hidden_states=tree_hidden_states[:,:-1], #MODIFIED
                     topk=10,
                 )  # [B, L_tree]
-                print("hidden:", [[f"{v:.2f}" for v in row] for row in tree_vis_scores.tolist()])
+                # print("hidden:", [[f"{v:.2f}" for v in row] for row in tree_vis_scores.tolist()])
 
     # Find the tokens that match the maximum logits for each position in the sequence
     posterior_mask = (
@@ -582,6 +581,13 @@ def evaluate_posterior(
             entropies=entropies,            # [B, T-1]
             entropy_threshold=loose_entropy,
             loose_window=loose_window,
+        )
+    elif loose == 'hidden_topk':
+        logits_prefix = logits[:, :-1, :]
+        candidates_accept_length = loose_match_hidden_topk(
+            posterior_mask=posterior_mask,   # [B, T_match]
+            vis_scores=tree_vis_scores,      # [B, T_match]    
+            k=loose_hidden_k,                
         )
     elif loose == 'hidden_topk_or_search':
         logits_prefix = logits[:, :-1, :]
@@ -651,8 +657,6 @@ def update_inference_inputs(
     del_len = 1
     for i in draft_model.tree_buffer['tree_indices']:
         del_len += len(i)
-    # print("del_len:",del_len)
-    # del_len = 11 # 1+4+4+1+1
     for draft_past_key_values_data in draft_past_key_values_data_list:
         draft_past_key_values_data = draft_past_key_values_data[..., :-del_len, :]
     draft_current_length_data.fill_(prev_input_len)

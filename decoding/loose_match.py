@@ -146,7 +146,67 @@ def loose_match_window_and_entropy(
                 if loose_count >= loose_window:
                     count += loose_count + 1
                     idx += loose_count + 1
-                    print("accept by window + entropy")
+                    # print("accept by window + entropy")
+                else:
+                    break
+
+            else:
+                idx += 1
+
+        accept_lengths.append(count)
+
+    return torch.tensor(accept_lengths, device=posterior_mask.device)
+
+
+
+def loose_match_hidden_topk(
+    posterior_mask,
+    vis_scores,
+    k: int = 5,
+):
+    if not isinstance(posterior_mask, torch.Tensor):
+        posterior_mask = torch.tensor(posterior_mask)
+
+    if not isinstance(vis_scores, torch.Tensor):
+        vis_scores = torch.tensor(vis_scores, dtype=torch.float32, device=posterior_mask.device)
+    else:
+        vis_scores = vis_scores.to(posterior_mask.device, dtype=torch.float32)
+
+    if vis_scores.dim() == 1:
+        vis_scores = vis_scores.unsqueeze(0).expand(posterior_mask.size(0), -1)
+
+    B, T = posterior_mask.shape
+    assert vis_scores.shape[0] == B, f"vis_scores batch not match: {vis_scores.shape[0]} vs {B}"
+    assert vis_scores.shape[1] >= T, f"vis_scores >= posterior_mask: {vis_scores.shape[1]} vs {T}"
+
+    vis_scores = vis_scores[:, :T]   # [B, T]
+
+    k = max(1, min(k, T))            
+    low_mask = torch.zeros_like(vis_scores, dtype=torch.bool)  # [B, T]
+
+    for b in range(B):
+        row_scores = vis_scores[b]   # [T]
+        topk_indices = torch.argsort(row_scores, dim=-1)[:k]   # [k]
+        low_mask[b, topk_indices] = True
+
+    accept_lengths = []
+
+    for b in range(B):
+        row = posterior_mask[b]   # [T]
+        allow_relax = low_mask[b] # [T]
+        count = 0
+        idx = 0
+
+        while idx < T:
+            if row[idx] == 1:
+                count += 1
+                idx += 1
+
+            elif row[idx] == 0:
+                if allow_relax[idx]:
+                    count += 1
+                    idx += 1
+                    # print("accept by hidden visual states (top-k)")
                 else:
                     break
 
@@ -230,7 +290,7 @@ def loose_match_hidden_topk_or_search(
                     src = []
                     if cond_hidden: src.append("top-k")
                     if cond_search: src.append("search")
-                    print(f"[b={b}, idx={idx-1}] accept by {', '.join(src)}")
+                    # print(f"[b={b}, idx={idx-1}] accept by {', '.join(src)}")
                 else:
                     break
 

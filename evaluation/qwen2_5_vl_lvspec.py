@@ -16,11 +16,9 @@ from transformers import (
     # Qwen2_5_VLForConditionalGeneration,
 )
 
-from lmms_eval.SpecVLM.models.modeling_qwen2_5_vl import Qwen2_5_VLForConditionalGeneration
-# from lmms_eval.SpecVLM.models.processing_qwen2_5_vl import Qwen2_5_VLProcessor
-from lmms_eval.SpecVLM.decoding.tree_decoding_qwen2_5 import *
-from lmms_eval.SpecVLM.tree_choices.choices import mc_sim_7b_63, chain, chain_15, chain2_8, chain2_10
-# from lmms_eval.SpecVLM.utils.utils import drop_visual_tokens_uniform
+from lmms_eval.LVSpec.models.modeling_qwen2_5_vl import Qwen2_5_VLForConditionalGeneration
+from lmms_eval.LVSpec.decoding.tree_decoding_qwen2_5 import *
+from lmms_eval.LVSpec.tree_choices.choices import mc_sim_7b_63, chain, chain_15, chain2_8, chain2_10
 
 from lmms_eval import utils
 from lmms_eval.api.instance import Instance
