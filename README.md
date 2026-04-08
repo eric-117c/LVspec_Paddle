@@ -114,9 +114,9 @@ We recommand using `quick inference` for quick testing, and using `benchmark eva
 
 
 ## 🛩️ Future Work
-- [ ] Release more evaluation scripts and benchmark configs.
-- [ ] Support more Video-LLM backbones and inference settings.
-- [ ] Extend LVSpec to more challenging long-video understanding tasks.
+- [ ] Explore vision-aware drafting structures.
+- [ ] Adapt to complex visual reasoning scenarios.
+- [ ] Explore design in the training phase.
 
 
 
