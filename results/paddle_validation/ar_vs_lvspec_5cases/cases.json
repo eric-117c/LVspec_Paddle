@@ -1,0 +1,42 @@
+[
+  {
+    "input_index": 0,
+    "video_name": "v_wCexKIuAj3A",
+    "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_wCexKIuAj3A.mp4",
+    "question": "Please provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes",
+    "answer": "The video begins in a news studio where five people are seated on a sofa. The studio is well-lit, with a glass window at the back. A TV screen with the word ‘Daybreak’ is placed behind the sofa. There is a white coffee table in the middle, which is lit from the inside. There are coffee cups and a laptop on the coffee table. A man sitting on the left side picks up an electronic cigarette from the table and speaks while holding it. A cutaway shot of people in a bar smoking e-cigarettes is shown. A man in a black shirt is blowing smoke circles. A few other men are shown blowing smoke circles. The video continues as the people in the studio continue to converse. The man on the left puts the e-cigarette down on the table. The video continues as the people continue to talk. A man on the right picks up a coffee cup and takes a drink as the video ends.",
+    "inputs_npz": "results/paddle_validation/ar_vs_lvspec_5cases/inputs_0.npz"
+  },
+  {
+    "input_index": 1,
+    "video_name": "v_FqYhC6_CMfI",
+    "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_FqYhC6_CMfI.mp4",
+    "question": "Please provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes",
+    "answer": "The video starts with a man windsurfing on a beach. He is wearing a dark blue vest and white shorts. the man attaches the sail to his board and starts to windsurf. Stilt houses are visible on the left of the man and trees are on the far left side. The sky is cloudy. Next, he starts windsurfing across the beach water. The water has mild waves. He falls from his board while windsurfing. The video ends with him falling from his board.\n",
+    "inputs_npz": "results/paddle_validation/ar_vs_lvspec_5cases/inputs_1.npz"
+  },
+  {
+    "input_index": 2,
+    "video_name": "v_w4pO-1-FG5w",
+    "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_w4pO-1-FG5w.mp4",
+    "question": "Please provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes",
+    "answer": "The video begins with a little boy getting a haircut in a saloon. He is sitting on a booster seat placed on a barber’s chair. A blue cape with pictures of animated characters on them is draped around the boy. A woman is using a trimmer attached to a vacuum to clip the boy’s hair. A mirror is visible covering the wall behind the chair.  Overhead lights are reflected in the mirror. The video ends with the woman still cutting the boy’s hair.",
+    "inputs_npz": "results/paddle_validation/ar_vs_lvspec_5cases/inputs_2.npz"
+  },
+  {
+    "input_index": 3,
+    "video_name": "v_4iFlM_Zu7xs",
+    "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_4iFlM_Zu7xs.mp4",
+    "question": "Please provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes",
+    "answer": "The video begins on a dirt bike track, where a man is jumping over an incline on his bike. There are white flat-top buildings visible in the far background. Another scene in a different place where a biker jumps over another dirt incline is shown. The video continues with a series of stunts performed by two riders one after another is shown. The riders are riding and jumping on the dirt track in a circle. A person holding a camera and recording the rider, in the middle of the dirt track can be seen. The riders perform a series of jumps one after another in a clip. The video ends with the two bikers jumping over a hill one after the other.",
+    "inputs_npz": "results/paddle_validation/ar_vs_lvspec_5cases/inputs_3.npz"
+  },
+  {
+    "input_index": 4,
+    "video_name": "v_4Gx_8vuxzAk",
+    "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_4Gx_8vuxzAk.mp4",
+    "question": "Please provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes",
+    "answer": "The video starts with a woman standing in a living room. She is holding a towel in one hand and a bottle of wood polish in the other. A white wall is visible behind her. There is a small curtain hanging on the wall. There are other items fixed to the wall as decoration. There is a maroon sofa visible behind the woman. A lamp is sitting on a table next to the sofa. The coffee table is placed in front of a two-seater red sofa. The woman drips some polish on the coffee table and proceeds to wipe it with the towel. The video ends with the woman standing over the coffee table and explaining how to fill cracks in the table.",
+    "inputs_npz": "results/paddle_validation/ar_vs_lvspec_5cases/inputs_4.npz"
+  }
+]

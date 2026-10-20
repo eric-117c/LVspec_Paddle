@@ -1,6 +1,8 @@
 transformers==4.48.0
+huggingface-hub>=0.25.0,<1.0
 datasets
 accelerate
 numpy
 qwen-vl-utils==0.0.10 
+decord==0.6.0
 av==14.0.0

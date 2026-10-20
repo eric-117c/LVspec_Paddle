@@ -1,0 +1,20 @@
+{
+  "input_hashes_match_previous_five_case_benchmark": true,
+  "methods": {
+    "ar": {
+      "runs": 10,
+      "complete_unique_input_repeat_pairs": true,
+      "nonempty_outputs_and_valid_token_accounting": true,
+      "all_outputs_identical_to_three_gpu_run": true,
+      "repeat_token_ids_identical": true
+    },
+    "lvspec": {
+      "runs": 10,
+      "complete_unique_input_repeat_pairs": true,
+      "nonempty_outputs_and_valid_token_accounting": true,
+      "all_outputs_identical_to_three_gpu_run": true,
+      "repeat_token_ids_identical": true
+    }
+  },
+  "source_hashes_match": true
+}

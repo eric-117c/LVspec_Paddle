@@ -1,0 +1,35 @@
+{
+  "basis": "Saved captions compared with human dataset references; no direct video inspection in this audit",
+  "notes": [
+    {
+      "input_index": 0,
+      "reference_fact": "Discussion of an electronic cigarette, including bar cutaways of smoke rings",
+      "ar": "Mentions cigarettes and smoking discussion, but not the electronic nature or bar cutaways",
+      "lvspec": "Does not mention smoking or e-cigarettes"
+    },
+    {
+      "input_index": 1,
+      "reference_fact": "The windsurfer falls from the board at the end",
+      "ar": "Does not mention the fall in the saved answer",
+      "lvspec": "Does not mention the fall"
+    },
+    {
+      "input_index": 2,
+      "reference_fact": "The hair trimmer is attached to a vacuum",
+      "ar": "Mentions a clipper without the vacuum attachment",
+      "lvspec": "Mentions electric clippers without the vacuum attachment"
+    },
+    {
+      "input_index": 3,
+      "reference_fact": "Two riders perform successive jumps",
+      "ar": "Describes multiple riders and jumps",
+      "lvspec": "Mainly describes one rider"
+    },
+    {
+      "input_index": 4,
+      "reference_fact": "The woman drips wood polish onto the coffee table",
+      "ar": "Describes wiping the table with solution; application location is unspecified",
+      "lvspec": "Says the solution is poured onto the cloth"
+    }
+  ]
+}

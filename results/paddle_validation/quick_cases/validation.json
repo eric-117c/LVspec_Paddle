@@ -1,0 +1,33 @@
+{
+  "status": "complete",
+  "exit_code": 0,
+  "backend": "paddle",
+  "method": "lvspec",
+  "model_pair": "Qwen2.5-VL-32B + 7B",
+  "frames_per_video": 64,
+  "dtype": "float16",
+  "cases_passed": 3,
+  "cases": [
+    {
+      "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_wCexKIuAj3A.mp4",
+      "passed": true,
+      "prompt_tokens": 3211,
+      "generated_tokens": 64,
+      "answer": "The video appears to be a segment from a morning television show, likely a news or talk show, given the formal attire of the participants and the presence of a studio setting. The scene is set in a brightly lit studio with a modern design, featuring a red carpeted floor, colorful furniture, and a backdrop that includes"
+    },
+    {
+      "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_FqYhC6_CMfI.mp4",
+      "passed": true,
+      "prompt_tokens": 7435,
+      "generated_tokens": 64,
+      "answer": "The video showcases a windsurfing session on a picturesque tropical beach. The main subject is a windsurfer navigating the turquoise waters, with the sail prominently displayed in various positions as they maneuver through the waves. The windsurfer is seen gliding across the water, occasionally adjusting their stance and the sail to harness the"
+    },
+    {
+      "video": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_w4pO-1-FG5w.mp4",
+      "passed": true,
+      "prompt_tokens": 8107,
+      "generated_tokens": 64,
+      "answer": "### Video Description\n\nThe video captures a scene inside a well-lit barbershop, where a young boy is getting a haircut. The setting is a typical barbershop with a clean and organized environment. The background features a large mirror, which reflects the activity in the shop, and various posters and advertisements are visible"
+    }
+  ]
+}

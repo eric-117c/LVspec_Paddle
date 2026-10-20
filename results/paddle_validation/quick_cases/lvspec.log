@@ -1,0 +1,94 @@
+WARNING: OMP_NUM_THREADS set to 2, not 1. The computation speed will not be optimized if you use data parallel. It will fail if this PaddlePaddle binary is compiled with OpenBlas since OpenBlas does not support multi-threads.
+PLEASE USE OMP_NUM_THREADS WISELY.
+Loading model-00001-of-00018.safetensors
+Loading model-00002-of-00018.safetensors
+Loading model-00003-of-00018.safetensors
+Loading model-00004-of-00018.safetensors
+Loading model-00005-of-00018.safetensors
+Loading model-00006-of-00018.safetensors
+Loading model-00007-of-00018.safetensors
+Loading model-00008-of-00018.safetensors
+Loading model-00009-of-00018.safetensors
+Loading model-00010-of-00018.safetensors
+Loading model-00011-of-00018.safetensors
+Loading model-00012-of-00018.safetensors
+Loading model-00013-of-00018.safetensors
+Loading model-00014-of-00018.safetensors
+Loading model-00015-of-00018.safetensors
+Loading model-00016-of-00018.safetensors
+Loading model-00017-of-00018.safetensors
+Loading model-00018-of-00018.safetensors
+Loading model-00001-of-00005.safetensors
+Loading model-00002-of-00005.safetensors
+Loading model-00003-of-00005.safetensors
+Loading model-00004-of-00005.safetensors
+Loading model-00005-of-00005.safetensors
+W1016 05:07:41.276561 478820 gpu_resources.cc:116] Please NOTE: device: 0, GPU Compute Capability: 8.0, Driver API Version: 13.0, Runtime API Version: 12.6
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+{
+  "sample_index": 0,
+  "method": "lvspec",
+  "backend": "paddle",
+  "decoding_time": 5.850613754009828,
+  "inference_time": 10.581307507818565,
+  "generate_len": 64,
+  "output": "system\nYou are a helpful assistant.\nuser\nPlease provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes\nassistant\nThe video appears to be a segment from a morning television show, likely a news or talk show, given the formal attire of the participants and the presence of a studio setting. The scene is set in a brightly lit studio with a modern design, featuring a red carpeted floor, colorful furniture, and a backdrop that includes",
+  "average_accept_length": 7.111111111111111
+}
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+{
+  "sample_index": 1,
+  "method": "lvspec",
+  "backend": "paddle",
+  "decoding_time": 5.308694074861705,
+  "inference_time": 12.108501138864085,
+  "generate_len": 64,
+  "output": "system\nYou are a helpful assistant.\nuser\nPlease provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes\nassistant\nThe video showcases a windsurfing session on a picturesque tropical beach. The main subject is a windsurfer navigating the turquoise waters, with the sail prominently displayed in various positions as they maneuver through the waves. The windsurfer is seen gliding across the water, occasionally adjusting their stance and the sail to harness the",
+  "average_accept_length": 8.0
+}
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+{
+  "sample_index": 2,
+  "method": "lvspec",
+  "backend": "paddle",
+  "decoding_time": 6.173211419954896,
+  "inference_time": 13.232229586923495,
+  "generate_len": 64,
+  "output": "system\nYou are a helpful assistant.\nuser\nPlease provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes\nassistant\n### Video Description\n\nThe video captures a scene inside a well-lit barbershop, where a young boy is getting a haircut. The setting is a typical barbershop with a clean and organized environment. The background features a large mirror, which reflects the activity in the shop, and various posters and advertisements are visible",
+  "average_accept_length": 7.111111111111111
+}

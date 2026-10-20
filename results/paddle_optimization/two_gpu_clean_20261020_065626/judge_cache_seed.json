@@ -1,0 +1,4 @@
+{
+  "source": "results/paddle_optimization/three_gpu_20261020_063411/judge_cache.jsonl",
+  "reuse": "Matching checkpoint/config/rubric/reference/prediction hashes only"
+}

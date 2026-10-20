@@ -1,0 +1,1 @@
+{"method": "ar", "backend": "paddle", "samples": 1, "avg_generate_len": 3.0, "avg_decoding_time": 1.2649948978796601, "avg_tokens_per_second": 2.3715510671454045}

@@ -1,0 +1,25 @@
+{
+  "target": "/home/wjy/models/Qwen2.5-VL-32B-Instruct",
+  "draft": "/home/wjy/models/Qwen2.5-VL-7B-Instruct",
+  "inputs_npz": [
+    "results/paddle_validation/video64/inputs.npz"
+  ],
+  "gpu_ids": "1,2,3",
+  "target_devices": "0,1",
+  "draft_devices": "2",
+  "dtype": "float16",
+  "max_new_tokens": 64,
+  "repeats": 1,
+  "drop_rate": 0.9,
+  "loose_hidden_k": 7,
+  "methods": [
+    "ar",
+    "specvlm_uniform",
+    "lvspec",
+    "lvspec_with_pst"
+  ],
+  "output": "results/paddle_validation/qwen32b_7b_gpu64",
+  "paddle_version": "3.3.1",
+  "shared_target_draft": false,
+  "timing_scope": "decoding only; excludes prefill and preprocessing"
+}

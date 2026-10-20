@@ -1,0 +1,51 @@
+{
+  "archived_one_off_scripts": [
+    {
+      "original_path": "wait_qwenvl_3gpu.py",
+      "sha256": "932fedb948a3795bff1a255a04c9fe5c534b2a616bdc1a67d6f63eee91b851ff"
+    },
+    {
+      "original_path": "run_qwenvl_3gpu_compare.sh",
+      "sha256": "f15d55533485c78f5ca84f08231625fcd90a1397d8b425202b71663659e9784a"
+    }
+  ],
+  "removed_generated_paths": [
+    "tests/paddle/__pycache__",
+    "tools/__pycache__",
+    "models/llava_next_video/__pycache__",
+    "models/__pycache__",
+    "evaluation/__pycache__",
+    ".DS_Store",
+    "utils/__pycache__",
+    "kv_cache/__pycache__",
+    "__pycache__",
+    "paddle_backend/__pycache__",
+    ".pytest_cache",
+    "decoding/__pycache__",
+    "tree_choices/__pycache__"
+  ],
+  "note": "Source model, Paddle backend, tests, reports and benchmark artifacts retained. Historical scripts are archival snapshots; their original root-relative paths no longer apply here.",
+  "verification": {
+    "cpu_regressions": {
+      "passed": 26,
+      "duration_seconds": 12.58
+    },
+    "gpu_regressions": {
+      "passed": 9,
+      "duration_seconds": 6.41,
+      "physical_gpu_ids": [
+        0,
+        3
+      ]
+    },
+    "syntax_and_report_links": "passed",
+    "large_model_performance_rerun": false
+  },
+  "cleaned_source_sha256": {
+    ".gitignore": "83bee5f108f2762a4f15be3794e498b60b73407879890d9bba9c64141291db1b",
+    "paddle_backend/checkpoint.py": "aabbb80f2c30c468fde1af785cf67acd6d50d29cae53447a4e386384c8c1f48c",
+    "paddle_backend/models.py": "52e6f7cd59621d71304ac534413c524dc5532f338e3a456fc774b15d2479c6a2",
+    "paddle_backend/optimization.py": "7bdb7418ae6e3bbec5a79a02be377648aa58b34e87f125780ea1d1e927f2c08b",
+    "decoding/tree_decoding_qwen2_5.py": "a38ad1e07999824d4b51478e4b896fa129c6bf0dac6d54bb5fa236eb3ca2e60b"
+  }
+}

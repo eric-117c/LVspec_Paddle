@@ -1,0 +1,17 @@
+[
+  {
+    "method": "ar",
+    "samples": 10,
+    "avg_generate_len": 512.0,
+    "avg_decoding_time": 54.325068387552164,
+    "avg_tokens_per_second": 9.424746534093966
+  },
+  {
+    "method": "lvspec",
+    "samples": 10,
+    "avg_generate_len": 393.2,
+    "avg_decoding_time": 33.2088465892477,
+    "avg_tokens_per_second": 11.840218507537978,
+    "avg_accept_length": 8.116112723754233
+  }
+]

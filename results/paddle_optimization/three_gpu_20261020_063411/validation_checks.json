@@ -1,0 +1,12 @@
+{
+  "cpu_backend_cli_comparison": {
+    "passed": 26
+  },
+  "cuda_graph_fp16_bf16": {
+    "passed": 2,
+    "physical_gpu_ids": [
+      7
+    ]
+  },
+  "scope": "Current source; checks completed before benchmark timing"
+}

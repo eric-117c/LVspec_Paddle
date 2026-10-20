@@ -1,0 +1,1 @@
+{"sample_index": 0, "method": "ar", "backend": "paddle", "decoding_time": 1.2649948978796601, "inference_time": 4.40862828399986, "generate_len": 3, "output": "system\nYou are a helpful assistant.\nuser\nPlease provide a detailed description of the video.\nassistant\nThe image provided"}

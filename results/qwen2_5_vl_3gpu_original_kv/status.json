@@ -1,0 +1,7 @@
+{
+  "status": "complete",
+  "kv_cache": "original",
+  "gpu_ids": "0,1,2",
+  "exit_code": 0,
+  "output": "/home/wjy/workFiles/LVSpec/results/qwen2_5_vl_3gpu_original_kv/speed_comparison.json"
+}

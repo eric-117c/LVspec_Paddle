@@ -1,0 +1,31 @@
+[
+  {
+    "model": "qwen",
+    "tensor": "logits",
+    "max_absolute_error": 0.0004572868347167969,
+    "root_mean_square_error": 3.914250191883184e-05,
+    "passed": false,
+    "argmax_agreement": 1.0
+  },
+  {
+    "model": "qwen",
+    "tensor": "hidden_states",
+    "max_absolute_error": 0.004082679748535156,
+    "root_mean_square_error": 3.931059472961351e-05,
+    "passed": false
+  },
+  {
+    "model": "qwen",
+    "tensor": "input_embeddings",
+    "max_absolute_error": 0.0003643035888671875,
+    "root_mean_square_error": 5.760064141213661e-06,
+    "passed": true
+  },
+  {
+    "model": "qwen",
+    "tensor": "video_features",
+    "max_absolute_error": 0.0003643035888671875,
+    "root_mean_square_error": 1.6793328541098163e-05,
+    "passed": true
+  }
+]

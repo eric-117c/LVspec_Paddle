@@ -1227,7 +1227,6 @@ def AR_generate_one_stage(inputs, model, max_new_tokens=100,video_token_id=15164
                 break
         torch.cuda.synchronize()
         toc = time.time()
-        
         return {
         'output_ids':generated,
         'inference_time':toc - tic1,

@@ -1,0 +1,39 @@
+{
+  "backend": "paddle",
+  "model_type": "qwen2_5_vl",
+  "base_model_path": "/home/wjy/models/Qwen2.5-VL-32B-Instruct",
+  "draft_model_path": "/home/wjy/models/Qwen2.5-VL-7B-Instruct",
+  "data_path": "results/paddle_validation/quick_cases/cases.json",
+  "video": null,
+  "inputs_npz": null,
+  "prompt": "Please provide a detailed description of the video.",
+  "task": "VideoDetailCaption",
+  "frame_num": 64,
+  "max_pixels": 200704,
+  "evaluation_num": 3,
+  "data_num": 3,
+  "max_new_tokens": 64,
+  "drop_rate": 0.9,
+  "loose_hidden_k": 7,
+  "method": "lvspec",
+  "tree_choice": null,
+  "dtype": "float16",
+  "device": "gpu",
+  "gpu_ids": "1,2,3",
+  "target_devices": "0,1",
+  "draft_devices": "2",
+  "attention": "sdpa",
+  "save_path": "results/paddle_validation/quick_cases/lvspec",
+  "save_inputs": true,
+  "target_devices_resolved": [
+    "gpu:0",
+    "gpu:1"
+  ],
+  "draft_devices_resolved": [
+    "gpu:2"
+  ],
+  "paddle_version": "3.3.1",
+  "token_accounting": "generated suffix only; includes EOS; capped at max_new_tokens",
+  "position_encoding": "LVSpec sequential positions",
+  "timing_scope": "decoding only; excludes model loading, preprocessing and prefill"
+}

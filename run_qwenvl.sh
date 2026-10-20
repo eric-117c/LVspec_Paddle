@@ -1,22 +1,24 @@
 export PYTORCH_CUDA_ALLOC_CONF='expandable_segments:True'
 
 MODEL_TYPE="qwen2_5_vl"             # Model type: llava_ov or qwen2_5_vl
-BASE_MODEL_PATH="/ycji/models/Qwen2.5-VL-32B-Instruct"  # Path to base model
-DRAFT_MODEL_PATH="/ycji/models/Qwen2.5-VL-7B-Instruct"  # Path to draft model
+BASE_MODEL_PATH="/home/wjy/models/Qwen2.5-VL-32B-Instruct"  # Path to base model
+DRAFT_MODEL_PATH="/home/wjy/models/Qwen2.5-VL-7B-Instruct"  # Path to draft model
 
 TASK="VideoDetailCaption"         # Task type: VideoDetailCaption, MVBench, MVLU, LongVideoBench, MMBench
-DATA_PATH="/ycji/datasets/VideoDetailCaption"  # Path to dataset
+DATA_PATH="/home/wjy/datasets/VideoDetailCaption"  # Path to dataset
 
 EVAL_NUM=5                      # Number of evaluation samples
 MAX_NEW_TOKENS=512              # Number of new tokens to generate
 DATA_NUM=100                    # Number of data samples to load
 DROP_RATE=0.9                   # Pruning ratio
-GPU_IDS="4,5"                   # GPU IDs to use
+GPU_IDS="${GPU_IDS:-0,1,2,3}"   # GPU IDs to use; allow an environment override
 
-METHOD="lvspec"                 # ar, specvlm_uniform, lvspec, lvspec_with_pst
+METHOD="${METHOD:-lvspec}"     # ar, specvlm_uniform, lvspec, lvspec_with_pst
 LOOSE_HIDDEN_K=7                # Loose parameter for relaxed verification
 
 FRAME_NUM=64     
+DEFAULT_SAVE_PATH="results/{$MODEL_TYPE}_{$METHOD}_drop{$DROP_RATE}_frame{$FRAME_NUM}"
+SAVE_PATH="${SAVE_PATH:-$DEFAULT_SAVE_PATH}"
 
 # Run evaluation
 CUDA_VISIBLE_DEVICES=$GPU_IDS python inference.py \
@@ -33,5 +35,5 @@ CUDA_VISIBLE_DEVICES=$GPU_IDS python inference.py \
     --gpu_ids $GPU_IDS \
     --method $METHOD \
     --loose_hidden_k $LOOSE_HIDDEN_K \
-    --save_path "results/{$MODEL_TYPE}_{$METHOD}_drop{$DROP_RATE}_frame{$FRAME_NUM}" \
+    --save_path "$SAVE_PATH" \
     # --setting "standard" \

@@ -1,0 +1,103 @@
+WARNING: OMP_NUM_THREADS set to 2, not 1. The computation speed will not be optimized if you use data parallel. It will fail if this PaddlePaddle binary is compiled with OpenBlas since OpenBlas does not support multi-threads.
+PLEASE USE OMP_NUM_THREADS WISELY.
+Loading model-00001-of-00018.safetensors
+Loading model-00002-of-00018.safetensors
+Loading model-00003-of-00018.safetensors
+Loading model-00004-of-00018.safetensors
+Loading model-00005-of-00018.safetensors
+Loading model-00006-of-00018.safetensors
+Loading model-00007-of-00018.safetensors
+Loading model-00008-of-00018.safetensors
+Loading model-00009-of-00018.safetensors
+Loading model-00010-of-00018.safetensors
+Loading model-00011-of-00018.safetensors
+Loading model-00012-of-00018.safetensors
+Loading model-00013-of-00018.safetensors
+Loading model-00014-of-00018.safetensors
+Loading model-00015-of-00018.safetensors
+Loading model-00016-of-00018.safetensors
+Loading model-00017-of-00018.safetensors
+Loading model-00018-of-00018.safetensors
+Loading model-00001-of-00005.safetensors
+Loading model-00002-of-00005.safetensors
+Loading model-00003-of-00005.safetensors
+Loading model-00004-of-00005.safetensors
+Loading model-00005-of-00005.safetensors
+W1016 05:17:37.899348 493988 gpu_resources.cc:116] Please NOTE: device: 0, GPU Compute Capability: 8.0, Driver API Version: 13.0, Runtime API Version: 12.6
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.48, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+{"sample_index": 0, "input_index": 0, "repeat": 0, "method": "ar", "backend": "paddle", "decoding_time": 58.81068312819116, "inference_time": 61.01877236017026, "generate_len": 512, "generated_ids": [785, 2766, 7952, 311, 387, 264, 10238, 504, 264, 6556, 12425, 1473, 11, 4363, 24849, 330, 10159, 8960, 1335, 438, 16317, 553, 279, 45250, 12426, 323, 1467, 389, 279, 4171, 13, 576, 6243, 374, 264, 75289, 13020, 14029, 448, 264, 6481, 11, 33866, 2884, 11, 16445, 2518, 323, 24932, 26148, 288, 11, 264, 4778, 1965, 448, 31494, 323, 264, 20638, 11, 323, 264, 38477, 9027, 264, 3283, 87739, 13, 576, 882, 12596, 389, 279, 4171, 374, 20699, 2163, 220, 15, 22, 25, 16, 17, 311, 220, 15, 22, 25, 16, 19, 11, 22561, 279, 10238, 374, 949, 315, 458, 4124, 6556, 12899, 382, 14374, 3070, 6202, 64718, 323, 26722, 25, 1019, 16, 13, 3070, 31377, 16102, 82, 323, 61582, 25, 1019, 256, 481, 576, 6028, 5244, 374, 389, 264, 1874, 315, 7775, 46313, 389, 279, 26148, 288, 13, 576, 1874, 5646, 264, 8593, 3468, 304, 264, 7781, 323, 18131, 11, 264, 8778, 1062, 38589, 304, 264, 6303, 8511, 11, 323, 3807, 14709, 13, 576, 8593, 3468, 374, 22040, 16634, 304, 10435, 11, 12743, 1677, 448, 806, 6078, 323, 22930, 9963, 264, 35113, 13, 576, 8778, 1062, 38589, 63648, 51209, 3132, 323, 30580, 311, 279, 10219, 624, 256, 481, 576, 14709, 11, 2670, 264, 883, 304, 264, 7781, 323, 264, 5220, 304, 264, 5383, 291, 8511, 11, 15759, 304, 279, 21276, 11, 28720, 311, 279, 10219, 448, 862, 1828, 38455, 382, 17, 13, 3070, 34, 43275, 665, 72599, 25, 1019, 256, 481, 576, 8593, 3468, 374, 3884, 19578, 264, 35113, 11, 892, 374, 264, 45250, 9124, 2392, 13, 1260, 9982, 279, 35113, 304, 806, 1424, 11, 22930, 12678, 432, 311, 806, 10780, 323, 56659, 6132, 16205, 13, 1096, 1917, 374, 26366, 304, 3807, 3265, 5239, 14951, 11, 80903, 279, 8544, 315, 19578, 382, 18, 13, 3070, 71021, 323, 42707, 25, 1019, 256, 481, 576, 10435, 7952, 311, 5772, 3948, 2163, 19578, 11, 438, 16317, 553, 279, 11504, 5244, 389, 279, 35113, 13, 576, 13026, 4263, 279, 8544, 448, 28765, 5866, 315, 19805, 11, 448, 1045, 14709, 25377, 803, 11371, 1091, 3800, 624, 256, 481, 576, 8593, 3468, 3545, 52392, 448, 806, 6078, 311, 45932, 3501, 11, 1393, 279, 8778, 1062, 38589, 31995, 264, 19300, 93015, 11, 16004, 6968, 323, 29338, 3381, 3641, 382, 14374, 3070, 8706, 323, 20037, 25, 1019, 12, 3070, 31377, 11586, 25, 1019, 220, 481, 576, 14029, 374, 1632, 2852, 275, 448, 264, 32976, 11, 6481, 36537, 13, 576, 4778, 1965, 304, 279, 4126, 374, 53816, 291, 448, 31494, 11, 264, 20638, 11, 323, 1008, 3589, 11, 22561, 264, 3669, 476, 10219, 3561, 624, 220, 481, 576, 38477, 4419, 264, 3283, 87739, 11, 7842, 264, 5530, 315, 3728, 323, 2266, 311, 279, 12899, 624, 2303, 12, 3070, 9594, 34157, 25, 1019, 220, 481, 576, 330, 10159, 8960, 1, 12426, 374, 72988, 12596, 389, 279, 4171, 11, 3156, 448, 279, 882, 323, 2400, 13, 4220, 5424, 54314, 279, 6556, 1473, 3561, 624, 220, 481, 13032, 5239, 14951, 315, 279, 35113, 323, 279, 16205, 525, 80919, 31290, 291, 6814, 279, 2766, 11, 13330, 6529, 311, 279, 8544, 315, 19578, 382, 14374, 3070], "output": "The video appears to be a segment from a morning television show, likely titled \"Daybreak,\" as indicated by the recurring logo and text on the screen. The setting is a brightly lit studio with a modern, colorful design, featuring red and purple couches, a round table with newspapers and a laptop, and a backdrop showing a city skyline. The time displayed on the screen is consistently around 07:12 to 07:14, suggesting the segment is part of an early morning broadcast.\n\n### **Main Subjects and Actions:**\n1. **Studio Hosts and Guests:**\n   - The primary focus is on a group of individuals seated on the couches. The group includes a male host in a suit and tie, a female co-host in a blue dress, and several guests. The male host is actively engaged in conversation, gesturing with his hands and occasionally holding a cigarette. The female co-host listens attentively and responds to the discussion.\n   - The guests, including a man in a suit and a woman in a patterned dress, participate in the dialogue, contributing to the discussion with their own perspectives.\n\n2. **Cigarette Smoking:**\n   - The male host is seen smoking a cigarette, which is a recurring visual element. He holds the cigarette in his hand, occasionally bringing it to his mouth and exhaling smoke. This action is highlighted in several close-up shots, emphasizing the topic of smoking.\n\n3. **Discussion and Interaction:**\n   - The conversation appears to revolve around smoking, as indicated by the repeated focus on the cigarette. The participants discuss the topic with varying levels of engagement, with some guests appearing more animated than others.\n   - The male host often gestures with his hands to emphasize points, while the female co-host maintains a calm demeanor, nodding and responding thoughtfully.\n\n### **Background and Setting:**\n- **Studio Environment:**\n  - The studio is well-lit with a vibrant, modern aesthetic. The round table in the center is cluttered with newspapers, a laptop, and other items, suggesting a news or discussion format.\n  - The backdrop features a city skyline, adding a sense of location and context to the broadcast.\n  \n- **Visual Elements:**\n  - The \"Daybreak\" logo is prominently displayed on the screen, along with the time and date. These elements reinforce the morning show format.\n  - Close-up shots of the cigarette and the smoke are interspersed throughout the video, drawing attention to the topic of smoking.\n\n### **"}
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+{"sample_index": 0, "input_index": 0, "repeat": 0, "method": "lvspec", "backend": "paddle", "decoding_time": 32.007354552159086, "inference_time": 35.96350425807759, "generate_len": 317, "generated_ids": [785, 2766, 7952, 311, 387, 264, 10238, 504, 264, 6556, 12425, 1473, 11, 4363, 264, 3669, 476, 3061, 1473, 11, 2661, 279, 15908, 68160, 315, 279, 13026, 323, 279, 9362, 315, 264, 14029, 6243, 13, 576, 6109, 374, 738, 304, 264, 75289, 13020, 14029, 448, 264, 6481, 2884, 11, 16445, 264, 2518, 27854, 291, 6422, 11, 33866, 14549, 11, 323, 264, 38477, 429, 5646, 264, 3283, 87739, 323, 264, 7377, 4171, 27940, 279, 3409, 330, 10159, 8960, 1, 3156, 448, 279, 882, 330, 15, 22, 25, 16, 17, 1, 476, 330, 15, 22, 25, 16, 18, 2217, 785, 1887, 14878, 2924, 264, 883, 323, 264, 5220, 46313, 389, 264, 2518, 26148, 11, 16634, 304, 10435, 13, 576, 883, 374, 25365, 304, 264, 7781, 323, 18131, 11, 1393, 279, 5220, 374, 12233, 264, 5383, 291, 8511, 13, 11733, 525, 46313, 44669, 11, 448, 279, 883, 12743, 1677, 448, 806, 6078, 438, 566, 21191, 11, 18860, 458, 11371, 10219, 13, 576, 5220, 63648, 51209, 3132, 11, 16004, 6968, 1059, 1968, 323, 22930, 29338, 382, 641, 279, 4004, 11, 1052, 525, 1008, 7775, 46313, 389, 264, 4428, 26148, 11, 22561, 264, 6945, 10219, 476, 264, 6945, 315, 11647, 13, 3776, 315, 279, 7775, 304, 279, 4004, 374, 12233, 264, 4158, 15478, 323, 7952, 311, 387, 14289, 526, 4402, 311, 279, 10435, 13, 576, 14029, 374, 18650, 448, 6481, 17716, 323, 10576, 11, 2670, 264, 1965, 448, 15689, 11, 264, 51489, 11, 323, 264, 45436, 6008, 11, 892, 11367, 311, 279, 6584, 3602, 41192, 16566, 382, 785, 8084, 16232, 315, 279, 2766, 13230, 264, 6001, 3602, 22570, 10219, 11, 10767, 5435, 311, 1482, 4357, 476, 6203, 17979, 13, 576, 9362, 315, 279, 3283, 87739, 304, 279, 4004, 323, 279, 330, 10159, 8960, 1, 43717, 389, 279, 4171, 13216, 429, 419, 374, 264, 6556, 1473, 10238, 11, 4363, 19469, 518, 8241, 21762, 448, 3669, 323, 25709, 4124, 304, 279, 1899, 13, 151645], "output": "The video appears to be a segment from a morning television show, likely a news or talk show, given the formal attire of the participants and the presence of a studio setting. The scene is set in a brightly lit studio with a modern design, featuring a red carpeted floor, colorful furniture, and a backdrop that includes a city skyline and a digital screen displaying the word \"Daybreak\" along with the time \"07:12\" or \"07:13.\"\n\nThe main subjects include a man and a woman seated on a red couch, engaged in conversation. The man is dressed in a suit and tie, while the woman is wearing a patterned dress. Both are seated comfortably, with the man gesturing with his hands as he speaks, indicating an animated discussion. The woman listens attentively, nodding her head and occasionally responding.\n\nIn the background, there are other individuals seated on a similar couch, suggesting a panel discussion or a panel of experts. One of the individuals in the background is wearing a white shirt and appears to be listening intently to the conversation. The studio is equipped with modern lighting and decor, including a table with papers, a mug, and a decorative plant, which adds to the professional yet inviting atmosphere.\n\nThe overall tone of the video suggests a serious yet engaging discussion, possibly related to current events or expert opinions. The presence of the city skyline in the background and the \"Daybreak\" branding on the screen indicate that this is a morning show segment, likely aimed at providing viewers with news and insights early in the day.", "average_accept_length": 8.128205128205128}
+/home/wjy/workFiles/LVSpec/paddle_backend/decoding.py:18: VisibleDeprecationWarning: [93m
+Warning:
+API "paddle.device.cuda.synchronize" is deprecated since 2.5.0, and will be removed in future versions. Please use "paddle.device.synchronize" instead.
+    Reason: synchronize in paddle.device.cuda will be removed in future [0m
+  paddle.device.cuda.synchronize(device)
+
+
+--------------------------------------
+C++ Traceback (most recent call last):
+--------------------------------------
+0   paddle::pybind::eager_api_matmul(_object*, _object*, _object*)
+1   matmul_ad_func(paddle::Tensor const&, paddle::Tensor const&, bool, bool, paddle::optional<paddle::Tensor*>)
+2   paddle::experimental::matmul(paddle::Tensor const&, paddle::Tensor const&, bool, bool, paddle::optional<paddle::Tensor*>)
+3   void phi::MatmulStrideKernel<phi::dtype::float16, phi::GPUContext>(phi::GPUContext const&, phi::DenseTensor const&, phi::DenseTensor const&, bool, bool, phi::DenseTensor*)
+4   void phi::MatmulKernel<phi::dtype::float16, phi::GPUContext>(phi::GPUContext const&, phi::DenseTensor const&, phi::DenseTensor const&, bool, bool, phi::DenseTensor*)
+5   void phi::MatMulFunctionImplWithBlas<phi::GPUContext, phi::dtype::float16>(phi::GPUContext const&, phi::DenseTensor const&, phi::DenseTensor const&, std::vector<long, std::allocator<long> > const&, std::vector<long, std::allocator<long> > const&, phi::DenseTensor*, bool, bool, bool, phi::funcs::MatmulPlanner*)
+6   void phi::funcs::Blas<phi::GPUContext>::GEMM<phi::dtype::float16>(CBLAS_TRANSPOSE, CBLAS_TRANSPOSE, long, long, long, phi::dtype::float16, phi::dtype::float16 const*, phi::dtype::float16 const*, phi::dtype::float16, phi::dtype::float16*) const
+7   phi::GPUContext::TensorCoreCublasCallIfAvailable(std::function<void (cublasContext*)> const&) const
+8   std::_Function_handler<void (cublasContext*), phi::funcs::CUBlas<phi::dtype::float16>::GEMM_EX<>(phi::GPUContext*, cublasOperation_t, cublasOperation_t, int, int, int, void const*, void const*, cudaDataType_t, int, void const*, cudaDataType_t, int, void const*, void*, cudaDataType_t, int, cudaDataType_t)::{lambda(cublasContext*)#1}>::_M_invoke(std::_Any_data const&, cublasContext*&&)
+
+----------------------
+Error Message Summary:
+----------------------
+FatalError: `Termination signal` is detected by the operating system.
+  [TimeInfo: *** Aborted at 1792128013 (unix time) try "date -d @1792128013" if you are using GNU date ***]
+  [SignalInfo: *** SIGTERM (@0x3f60007c0cc) received by PID 493988 (TID 0x75cc0a747740) from PID 508108 ***]
+

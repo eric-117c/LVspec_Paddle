@@ -1,3 +1,19 @@
+import sys
+
+# Select the backend before importing Torch or CUDA-dependent preprocessing.
+if __name__ == "__main__":
+    _backend = next((arg.split("=", 1)[1] for arg in sys.argv[1:] if arg.startswith("--backend=")), None)
+    if "--backend" in sys.argv:
+        _index = sys.argv.index("--backend")
+        if _index + 1 < len(sys.argv):
+            _backend = sys.argv[_index + 1]
+    if _backend == "paddle":
+        from paddle_backend.inference import main
+        main()
+        raise SystemExit(0)
+    if _backend is not None:
+        raise SystemExit("Use --backend paddle for Paddle, or omit --backend for PyTorch")
+
 import os
 import torch
 from tqdm import tqdm

@@ -1,0 +1,25 @@
+{
+  "target": "/home/wjy/models/Qwen2.5-VL-7B-Instruct",
+  "draft": null,
+  "inputs_npz": [
+    "results/paddle_validation/qwen7b_ar/inputs_0.npz"
+  ],
+  "gpu_ids": "0",
+  "target_devices": "cpu",
+  "draft_devices": "cpu",
+  "dtype": "float32",
+  "max_new_tokens": 4,
+  "repeats": 1,
+  "drop_rate": 0.9,
+  "loose_hidden_k": 7,
+  "methods": [
+    "ar",
+    "specvlm_uniform",
+    "lvspec",
+    "lvspec_with_pst"
+  ],
+  "output": "results/paddle_validation/qwen7b_cpu_modes",
+  "paddle_version": "3.3.1",
+  "shared_target_draft": true,
+  "timing_scope": "decoding only; excludes prefill and preprocessing"
+}

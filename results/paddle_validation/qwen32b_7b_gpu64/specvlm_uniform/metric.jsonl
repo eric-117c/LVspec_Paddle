@@ -1,0 +1,1 @@
+{"method": "specvlm_uniform", "samples": 1, "avg_generate_len": 64.0, "avg_decoding_time": 9.459746792912483, "avg_tokens_per_second": 6.765508781688602, "avg_accept_length": 4.0}

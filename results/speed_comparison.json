@@ -1,0 +1,66 @@
+{
+  "scope": "decoding only; excludes prefill, video preprocessing and model loading",
+  "full_ar": {
+    "samples": 5,
+    "total_generated_tokens": 2555,
+    "total_decoding_seconds": 275.28000000000003,
+    "tokens_per_second": 9.281458878233071,
+    "avg_decoding_seconds": 55.056000000000004
+  },
+  "accelerated": {
+    "samples": 5,
+    "total_generated_tokens": 1842,
+    "total_decoding_seconds": 105.13000000000001,
+    "tokens_per_second": 17.5211642728051,
+    "avg_decoding_seconds": 21.026000000000003
+  },
+  "decoding_throughput_speedup": 1.8877597264257486,
+  "decoding_time_ratio": 2.6184723675449444,
+  "per_sample": [
+    {
+      "sample_index": 0,
+      "full_tokens": 511,
+      "accelerated_tokens": 369,
+      "full_tokens_per_second": 11.074989163415692,
+      "accelerated_tokens_per_second": 16.681735985533454,
+      "throughput_speedup": 1.5062530300831967
+    },
+    {
+      "sample_index": 1,
+      "full_tokens": 511,
+      "accelerated_tokens": 260,
+      "full_tokens_per_second": 9.103866025298414,
+      "accelerated_tokens_per_second": 19.11764705882353,
+      "throughput_speedup": 2.099948198457465
+    },
+    {
+      "sample_index": 2,
+      "full_tokens": 511,
+      "accelerated_tokens": 517,
+      "full_tokens_per_second": 8.751498544271278,
+      "accelerated_tokens_per_second": 15.863761890150352,
+      "throughput_speedup": 1.8126909134361626
+    },
+    {
+      "sample_index": 3,
+      "full_tokens": 511,
+      "accelerated_tokens": 391,
+      "full_tokens_per_second": 8.74700445053064,
+      "accelerated_tokens_per_second": 18.971373119844735,
+      "throughput_speedup": 2.1688994474781396
+    },
+    {
+      "sample_index": 4,
+      "full_tokens": 511,
+      "accelerated_tokens": 305,
+      "full_tokens_per_second": 9.092526690391459,
+      "accelerated_tokens_per_second": 18.815545959284393,
+      "throughput_speedup": 2.069341845228538
+    }
+  ],
+  "note": "Uses repository generate_len accounting. Outputs may have different lengths; throughput speedup normalizes by generated tokens. Matching sample indices alone does not validate identical inputs or hardware.",
+  "result_directories": {
+    "full_ar": "/home/wjy/workFiles/LVSpec/results/{qwen2_5_vl}_{ar}_drop{0.9}_frame{64}",
+    "accelerated": "/home/wjy/workFiles/LVSpec/results/{qwen2_5_vl}_{lvspec}_drop{0.9}_frame{64}"
+  }
+}

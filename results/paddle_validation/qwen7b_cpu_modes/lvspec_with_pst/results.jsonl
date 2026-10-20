@@ -1,0 +1,1 @@
+{"sample_index": 0, "method": "lvspec_with_pst", "backend": "paddle", "decoding_time": 5.5563393391203135, "inference_time": 8.446329126134515, "generate_len": 4, "generated_ids": [785, 2168, 3897, 374], "output": "The image provided is", "average_accept_length": 4.0}

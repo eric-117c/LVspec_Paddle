@@ -60,7 +60,7 @@ def load_model(model_type, base_model_path, draft_model_path):
 def load_data(task, data_num, data_path):
     if task == "VideoDetailCaption":
         data_video = load_dataset(
-                "/ycji/datasets/VideoDetailCaption",
+                data_path,
                 split="test",
                 # cache_dir=cache_dir,
             ).shuffle(seed=42).select(range(data_num))
@@ -739,7 +739,7 @@ def clip_input_video(processor, task, data_instance, frame_num=64, model_type='l
                 "content": [
                     {
                         "type": "video",
-                        "video": f"file://{video_path}",
+                        "video": video_path,
                         "max_pixels": 448*448,  
                         "fps": fps, 
                     },

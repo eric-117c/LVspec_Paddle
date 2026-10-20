@@ -1,0 +1,25 @@
+{
+  "status": "complete",
+  "pid": 1543177,
+  "output": "results/paddle_optimization/two_gpu_clean_20261020_065626",
+  "physical_gpu_ids": [
+    0,
+    4
+  ],
+  "started_utc": "2026-10-20T06:56:26.473601+00:00",
+  "previous_contended_run": "results/paddle_optimization/three_gpu_20261020_063411",
+  "exit_code": 0,
+  "finished_utc": "2026-10-20T07:12:32.876735+00:00",
+  "quality_complete": true,
+  "integrity_checks_passed": true,
+  "regression_tests_passed": 35,
+  "decoding_throughput_speedup": 2.1947733650624475,
+  "inference_throughput_speedup": 1.6251531068126586,
+  "quality_correctness": {
+    "ar": 3.6,
+    "lvspec": 3.4
+  },
+  "two_gpu_five_case_verification": "complete",
+  "three_gpu_clean_verification": "not completed: GPU 5 was taken by another job during the three-GPU run",
+  "scope": "Five videos, two repeats per method, 512 token cap; not a full dataset or matched PyTorch/Paddle comparison"
+}

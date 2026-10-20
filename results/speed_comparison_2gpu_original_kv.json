@@ -1,0 +1,19 @@
+{
+  "status": "failed_cuda_out_of_memory",
+  "gpu_ids": [
+    0,
+    1
+  ],
+  "kv_cache": "original repository implementation",
+  "method": "lvspec",
+  "evaluation_num": 5,
+  "frame_num": 64,
+  "max_new_tokens": 512,
+  "completed_samples": 0,
+  "failure_stage": "initialize_past_key_values(draft_model)",
+  "requested_allocation_gib": 8.3,
+  "available_memory_gib": 4.81,
+  "full_ar_status": "not_run: accelerated method failed before decoding",
+  "decoding_throughput_speedup": null,
+  "log": "/home/wjy/workFiles/lvspec_2gpu_original_kv.log"
+}

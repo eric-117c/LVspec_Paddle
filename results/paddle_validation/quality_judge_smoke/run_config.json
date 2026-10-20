@@ -1,0 +1,1 @@
+{"inputs_npz": ["results/paddle_validation/video64/inputs.npz"], "input_sha256": ["d13e4e0769a792606995c0c346ddee386ec853284b212f69a683345ea107a74a"], "max_new_tokens": 64}

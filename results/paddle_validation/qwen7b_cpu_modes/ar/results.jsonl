@@ -1,0 +1,1 @@
+{"sample_index": 0, "method": "ar", "backend": "paddle", "decoding_time": 1.314511446049437, "inference_time": 2.8292175501119345, "generate_len": 4, "generated_ids": [785, 2168, 3897, 374], "output": "The image provided is"}

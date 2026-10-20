@@ -1,0 +1,18 @@
+{
+  "python": "3.13.13",
+  "packages": {
+    "paddlepaddle-gpu": "3.3.1",
+    "numpy": "2.5.4",
+    "safetensors": "0.8.0",
+    "transformers": "4.48.0",
+    "av": "19.0.1",
+    "pytest": "9.1.1"
+  },
+  "gpu_inventory": "0, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n1, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n2, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n3, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n4, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n5, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n6, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n7, NVIDIA A100-SXM4-80GB, 580.95.05, 81920 MiB\n",
+  "test_suite": {
+    "command": "CUDA_VISIBLE_DEVICES=4,6 OMP_NUM_THREADS=1 python -m pytest -q tests/paddle",
+    "passed": 29,
+    "duration_seconds": 18.8
+  },
+  "date_utc": "2026-10-16"
+}

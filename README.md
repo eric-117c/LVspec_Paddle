@@ -23,6 +23,23 @@
 
 </div>
 
+## Paddle adaptation
+
+This repository adds a native Paddle inference backend to
+[the upstream LVSpec project](https://github.com/zju-jiyicheng/LVSpec).
+The local five-video, two-A100 test measured **2.19× decoding throughput** and
+**1.63× throughput including prefill** relative to the same Paddle AR baseline.
+Answer quality is not established as lossless; these results are not a controlled
+Paddle-versus-PyTorch framework comparison.
+
+- [Setup and inference](docs/PADDLE.md)
+- [Delivery report: implementation and optimization](docs/DELIVERY_REPORT.md)
+- [Comprehensive test report](docs/TEST_REPORT.md)
+- [Saved test evidence and input regeneration](results/README.md)
+
+The original paper description below documents the upstream work; its reported
+paper results are separate from the local Paddle measurements above.
+
 Yicheng Ji*, Jun Zhang*, Jinpeng Chen, Cong Wang, Lidan Shou, Gang Chen, Huan Li (* equal contribution)
 
 ## 📣 Overview
@@ -73,6 +90,17 @@ pip install -r requirements.txt
 
 
 ## 🚀 Quick Inference
+### Paddle backend
+
+Native Paddle video inference is available for Qwen2.5-VL and LLaVA-OneVision,
+including AR, SpecVLM, LVSpec and LVSpec+PST. See [Paddle setup and validation](docs/PADDLE.md)
+for dependencies, weight loading, GPU placement, supported inputs and verification.
+
+```bash
+METHOD=lvspec bash run_qwenvl_paddle.sh
+# Equivalent entry point: python inference.py --backend paddle --help
+```
+
 Run the demo script to quickly evaluate LVSpec:
 ```bash
 # Qwen2.5-VL
@@ -85,6 +113,27 @@ We support autoregressive, naive speculative decoding, SpecVLM, and LVSpec infer
 Please also modify the model path, data path, pruning ratio, and frame number in the `.sh` file.
 
 After running the script, the output and efficiency metric will be stored in the `save_path`.
+
+To compare full-input autoregressive decoding with LVSpec, run both on the same
+samples, GPU configuration, frame count, and generation limit:
+
+```bash
+METHOD=ar bash run_qwenvl.sh
+METHOD=lvspec bash run_qwenvl.sh
+python compare_speed.py \
+  --baseline 'results/{qwen2_5_vl}_{ar}_drop{0.9}_frame{64}' \
+  --accelerated 'results/{qwen2_5_vl}_{lvspec}_drop{0.9}_frame{64}' \
+  --output results/speed_comparison.json
+```
+
+The AR branch uses the target model's full visual input; `drop_rate` only affects
+the speculative draft input.
+
+The throughput speedup is `(LVSpec total tokens / LVSpec total decoding time)`
+divided by `(AR total tokens / AR total decoding time)`, using the repository's
+token counters. This measures decoding only, excluding prefill and video
+preprocessing. The report also includes the decoding time ratio; output lengths
+can differ between methods. This timing comparison does not measure answer quality.
 
 
 ## 🚀 Benchmark Evaluation

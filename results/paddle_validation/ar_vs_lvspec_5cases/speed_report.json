@@ -1,0 +1,180 @@
+{
+  "methods": {
+    "ar": {
+      "runs": 10,
+      "generated_tokens": 5120,
+      "decoding_seconds": 543.2506838755216,
+      "inference_seconds": 585.2810882481281,
+      "decoding_tokens_per_second": 9.424746534093966,
+      "inference_tokens_per_second": 8.747933433703212,
+      "mean_generated_tokens": 512.0,
+      "mean_inference_seconds": 58.528108824812804
+    },
+    "lvspec": {
+      "runs": 10,
+      "generated_tokens": 3932,
+      "decoding_seconds": 332.08846589247696,
+      "inference_seconds": 395.9477356704883,
+      "decoding_tokens_per_second": 11.840218507537978,
+      "inference_tokens_per_second": 9.930603576610045,
+      "mean_generated_tokens": 393.2,
+      "mean_inference_seconds": 39.59477356704883
+    }
+  },
+  "per_video": [
+    {
+      "input_index": 0,
+      "methods": {
+        "ar": {
+          "runs": 2,
+          "generated_tokens": 1024,
+          "decoding_seconds": 111.01101574185304,
+          "inference_seconds": 115.33694385620765,
+          "decoding_tokens_per_second": 9.224309796256865,
+          "inference_tokens_per_second": 8.878334779501671,
+          "mean_generated_tokens": 512.0,
+          "mean_inference_seconds": 57.66847192810383
+        },
+        "lvspec": {
+          "runs": 2,
+          "generated_tokens": 634,
+          "decoding_seconds": 53.3278873860836,
+          "inference_seconds": 59.961026651086286,
+          "decoding_tokens_per_second": 11.888713974546985,
+          "inference_tokens_per_second": 10.573534767662524,
+          "mean_generated_tokens": 317.0,
+          "mean_inference_seconds": 29.980513325543143
+        }
+      },
+      "decoding_throughput_speedup": 1.2888459122840072,
+      "repeat_token_ids_identical": {
+        "ar": true,
+        "lvspec": true
+      }
+    },
+    {
+      "input_index": 1,
+      "methods": {
+        "ar": {
+          "runs": 2,
+          "generated_tokens": 1024,
+          "decoding_seconds": 108.24046711204574,
+          "inference_seconds": 117.37320143496618,
+          "decoding_tokens_per_second": 9.46041741431142,
+          "inference_tokens_per_second": 8.724308338538206,
+          "mean_generated_tokens": 512.0,
+          "mean_inference_seconds": 58.68660071748309
+        },
+        "lvspec": {
+          "runs": 2,
+          "generated_tokens": 362,
+          "decoding_seconds": 32.1807496342808,
+          "inference_seconds": 46.654613758204505,
+          "decoding_tokens_per_second": 11.248961074989273,
+          "inference_tokens_per_second": 7.759146863290451,
+          "mean_generated_tokens": 181.0,
+          "mean_inference_seconds": 23.327306879102252
+        }
+      },
+      "decoding_throughput_speedup": 1.1890554700020108,
+      "repeat_token_ids_identical": {
+        "ar": true,
+        "lvspec": true
+      }
+    },
+    {
+      "input_index": 2,
+      "methods": {
+        "ar": {
+          "runs": 2,
+          "generated_tokens": 1024,
+          "decoding_seconds": 107.58150330581702,
+          "inference_seconds": 117.10797109687701,
+          "decoding_tokens_per_second": 9.518364853938897,
+          "inference_tokens_per_second": 8.74406746533847,
+          "mean_generated_tokens": 512.0,
+          "mean_inference_seconds": 58.553985548438504
+        },
+        "lvspec": {
+          "runs": 2,
+          "generated_tokens": 1024,
+          "decoding_seconds": 87.51051472406834,
+          "inference_seconds": 101.55673207505606,
+          "decoding_tokens_per_second": 11.701450999674734,
+          "inference_tokens_per_second": 10.08303417289173,
+          "mean_generated_tokens": 512.0,
+          "mean_inference_seconds": 50.77836603752803
+        }
+      },
+      "decoding_throughput_speedup": 1.2293551654339485,
+      "repeat_token_ids_identical": {
+        "ar": true,
+        "lvspec": true
+      }
+    },
+    {
+      "input_index": 3,
+      "methods": {
+        "ar": {
+          "runs": 2,
+          "generated_tokens": 1024,
+          "decoding_seconds": 107.82381780492142,
+          "inference_seconds": 117.2988052079454,
+          "decoding_tokens_per_second": 9.496974053104447,
+          "inference_tokens_per_second": 8.729841690924895,
+          "mean_generated_tokens": 512.0,
+          "mean_inference_seconds": 58.6494026039727
+        },
+        "lvspec": {
+          "runs": 2,
+          "generated_tokens": 888,
+          "decoding_seconds": 76.2640014658682,
+          "inference_seconds": 90.35713024693541,
+          "decoding_tokens_per_second": 11.643763544159462,
+          "inference_tokens_per_second": 9.827669355735408,
+          "mean_generated_tokens": 444.0,
+          "mean_inference_seconds": 45.178565123467706
+        }
+      },
+      "decoding_throughput_speedup": 1.226049842723668,
+      "repeat_token_ids_identical": {
+        "ar": true,
+        "lvspec": true
+      }
+    },
+    {
+      "input_index": 4,
+      "methods": {
+        "ar": {
+          "runs": 2,
+          "generated_tokens": 1024,
+          "decoding_seconds": 108.59387991088443,
+          "inference_seconds": 118.16416665213183,
+          "decoding_tokens_per_second": 9.42962900708886,
+          "inference_tokens_per_second": 8.66590971706841,
+          "mean_generated_tokens": 512.0,
+          "mean_inference_seconds": 59.08208332606591
+        },
+        "lvspec": {
+          "runs": 2,
+          "generated_tokens": 1024,
+          "decoding_seconds": 82.80531268217601,
+          "inference_seconds": 97.41823293920606,
+          "decoding_tokens_per_second": 12.366356298059337,
+          "inference_tokens_per_second": 10.511379329155233,
+          "mean_generated_tokens": 512.0,
+          "mean_inference_seconds": 48.70911646960303
+        }
+      },
+      "decoding_throughput_speedup": 1.3114361433268213,
+      "repeat_token_ids_identical": {
+        "ar": true,
+        "lvspec": true
+      }
+    }
+  ],
+  "decoding_throughput_speedup": 1.2562903909093,
+  "inference_throughput_speedup": 1.135194232085758,
+  "inference_wall_time_speedup": 1.4781776368970192,
+  "inference_scope": "model prefill + decoding; excludes loading and video preprocessing"
+}

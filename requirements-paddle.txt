@@ -1,0 +1,9 @@
+# Install exactly one of paddlepaddle / paddlepaddle-gpu separately (see docs/PADDLE.md).
+numpy>=1.26,<3
+safetensors>=0.8.0,<0.9
+transformers==4.48.0
+huggingface-hub>=0.25,<1
+datasets>=3,<6
+av>=14,<20
+Pillow>=10
+Jinja2>=3.1,<4

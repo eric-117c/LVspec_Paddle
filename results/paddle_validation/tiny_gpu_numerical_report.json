@@ -1,0 +1,60 @@
+[
+  {
+    "model": "qwen",
+    "tensor": "logits",
+    "max_absolute_error": 9.685754776000977e-08,
+    "root_mean_square_error": 2.6048608603446155e-08,
+    "passed": true,
+    "argmax_agreement": 1.0
+  },
+  {
+    "model": "qwen",
+    "tensor": "hidden_states",
+    "max_absolute_error": 6.556510925292969e-07,
+    "root_mean_square_error": 2.0706367820366722e-07,
+    "passed": true
+  },
+  {
+    "model": "qwen",
+    "tensor": "input_embeddings",
+    "max_absolute_error": 7.450580596923828e-09,
+    "root_mean_square_error": 2.076098182257624e-09,
+    "passed": true
+  },
+  {
+    "model": "qwen",
+    "tensor": "video_features",
+    "max_absolute_error": 7.450580596923828e-09,
+    "root_mean_square_error": 2.542690502593814e-09,
+    "passed": true
+  },
+  {
+    "model": "llava",
+    "tensor": "logits",
+    "max_absolute_error": 9.313225746154785e-08,
+    "root_mean_square_error": 2.4446414670364902e-08,
+    "passed": true,
+    "argmax_agreement": 1.0
+  },
+  {
+    "model": "llava",
+    "tensor": "hidden_states",
+    "max_absolute_error": 5.960464477539062e-07,
+    "root_mean_square_error": 1.795594499753861e-07,
+    "passed": true
+  },
+  {
+    "model": "llava",
+    "tensor": "input_embeddings",
+    "max_absolute_error": 2.6775524020195007e-09,
+    "root_mean_square_error": 7.304838955946025e-10,
+    "passed": true
+  },
+  {
+    "model": "llava",
+    "tensor": "video_features",
+    "max_absolute_error": 2.6775524020195007e-09,
+    "root_mean_square_error": 8.075802804263787e-10,
+    "passed": true
+  }
+]

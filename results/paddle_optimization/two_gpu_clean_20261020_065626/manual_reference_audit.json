@@ -1,0 +1,34 @@
+{
+  "scope": "Manual reading of saved captions and dataset reference text; videos were not viewed. Missing reference facts do not establish visual truth; additional claims remain unverified.",
+  "cases": [
+    {
+      "input_index": 0,
+      "ar": "Mentions smoking and cigarettes; does not identify e-cigarettes. Saved truncated caption does not state the bar cutaway.",
+      "lvspec": "Recognizes studio conversation but omits smoking/e-cigarette topic.",
+      "judge_issue": "AR review claims the prediction correctly notes a bar cutaway; this is absent from the saved output."
+    },
+    {
+      "input_index": 1,
+      "ar": "Omits final fall; describes multiple windsurfers and another surfer, unlike the reference focus on one man.",
+      "lvspec": "Omits final fall, sail setup and stilt houses.",
+      "judge_issue": "AR review claims a fall is briefly mentioned; it is absent from the saved output."
+    },
+    {
+      "input_index": 2,
+      "ar": "Recognizes boy/cape/haircut; omits booster seat and vacuum attachment.",
+      "lvspec": "Recognizes boy/cape/haircut; omits booster seat and vacuum attachment."
+    },
+    {
+      "input_index": 3,
+      "ar": "Saved caption focuses on one rider and introductory text; does not describe two riders jumping in sequence or the person filming.",
+      "lvspec": "Focuses on one rider; omits the two-rider sequence and person filming.",
+      "unverified": "Title text and specific rider names are not established by the reference."
+    },
+    {
+      "input_index": 4,
+      "ar": "Recognizes cleaning a wooden table; does not specify dripping polish onto table or filling cracks.",
+      "lvspec": "Says solution is poured onto cloth, whereas reference says onto table; omits filling cracks."
+    }
+  ],
+  "conclusion": "Both methods omit reference details; LVSpec has additional task-relevant omissions. Automated scores alone do not establish accuracy preservation."
+}

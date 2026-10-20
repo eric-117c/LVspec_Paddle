@@ -1,0 +1,5 @@
+{
+  "source": "results/paddle_validation/ar_vs_lvspec_5cases/judge_cache.jsonl",
+  "sha256": "7e949fed3b655c61ff750dc8ce48257ead566cc18358b377e7c0fc0f2fb7da0c",
+  "reuse": "Only matching checkpoint/config/rubric/reference/prediction hash entries are reused by evaluator"
+}

@@ -1,0 +1,33 @@
+[
+  {
+    "method": "ar",
+    "samples": 1,
+    "avg_generate_len": 64.0,
+    "avg_decoding_time": 6.317085101036355,
+    "avg_tokens_per_second": 10.131254997577985
+  },
+  {
+    "method": "specvlm_uniform",
+    "samples": 1,
+    "avg_generate_len": 64.0,
+    "avg_decoding_time": 9.459746792912483,
+    "avg_tokens_per_second": 6.765508781688602,
+    "avg_accept_length": 4.0
+  },
+  {
+    "method": "lvspec",
+    "samples": 1,
+    "avg_generate_len": 64.0,
+    "avg_decoding_time": 5.771038918057457,
+    "avg_tokens_per_second": 11.089857633734782,
+    "avg_accept_length": 7.111111111111111
+  },
+  {
+    "method": "lvspec_with_pst",
+    "samples": 1,
+    "avg_generate_len": 64.0,
+    "avg_decoding_time": 6.6382428840734065,
+    "avg_tokens_per_second": 9.641105503016464,
+    "avg_accept_length": 7.111111111111111
+  }
+]

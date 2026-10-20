@@ -1,0 +1,13 @@
+{
+  "cpu_backend_cli_comparison": {
+    "passed": 26
+  },
+  "gpu_checks": {
+    "passed": 9,
+    "physical_gpu_ids": [
+      0,
+      4
+    ]
+  },
+  "note": "GPU checks include FP16/BF16 graph tests; total 35 passed"
+}

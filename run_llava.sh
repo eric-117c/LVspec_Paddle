@@ -5,7 +5,7 @@ BASE_MODEL_PATH="/ycji/models/llava-onevision-qwen2-72b-ov-hf"  # Path to base m
 DRAFT_MODEL_PATH="/ycji/models/llava-onevision-qwen2-7b-ov-hf"  # Path to draft model
 
 TASK="VideoDetailCaption"         # Task type: VideoDetailCaption, MVBench, MVLU, LongVideoBench, MMBench
-DATA_PATH="/ycji/datasets/VideoDetailCaption"  # Path to dataset
+DATA_PATH="/home/wjy/datasets/VideoDetailCaption"  # Path to dataset
 
 EVAL_NUM=1                       # Number of evaluation samples
 MAX_NEW_TOKENS=512               # Number of new tokens to generate

@@ -1,0 +1,11 @@
+{
+  "benchmark_pid": 659724,
+  "physical_gpu_ids": [
+    "3",
+    "4"
+  ],
+  "snapshots": 6,
+  "other_compute_pids": [],
+  "no_other_compute_process_observed": true,
+  "sampling_interval_seconds": 5
+}

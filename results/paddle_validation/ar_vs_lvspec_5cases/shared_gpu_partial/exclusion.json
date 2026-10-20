@@ -1,0 +1,15 @@
+{
+  "reason": "Another process started on physical GPU 1 during timing; excluded from reported comparison.",
+  "benchmark_pid": 493988,
+  "competing_pid": 501483,
+  "original_physical_gpus": [
+    1,
+    2,
+    3
+  ],
+  "replacement_physical_gpus": [
+    2,
+    3,
+    4
+  ]
+}

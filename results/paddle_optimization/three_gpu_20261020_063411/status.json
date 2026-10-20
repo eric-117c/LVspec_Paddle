@@ -1,0 +1,16 @@
+{
+  "status": "complete_with_contended_timing",
+  "pid": 1458393,
+  "output": "results/paddle_optimization/three_gpu_20261020_063411",
+  "physical_gpu_ids": [
+    0,
+    4,
+    5
+  ],
+  "started_utc": "2026-10-20T06:34:11.269692+00:00",
+  "exit_code": 0,
+  "finished_utc": "2026-10-20T06:53:54.917435+00:00",
+  "quality_complete": true,
+  "timing_valid": false,
+  "regression_tests_passed": 35
+}

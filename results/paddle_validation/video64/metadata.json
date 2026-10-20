@@ -1,0 +1,27 @@
+{
+  "video_path": "/home/wjy/datasets/VideoDetailCaption/Test_Videos/v_wCexKIuAj3A.mp4",
+  "question": "Please provide a detailed description of the video, focusing on the main subjects, their actions, and the background scenes",
+  "frame_num": 64,
+  "fps": 0.47961630695443647,
+  "input_shapes": {
+    "input_ids": [
+      1,
+      3211
+    ],
+    "attention_mask": [
+      1,
+      3211
+    ],
+    "pixel_values_videos": [
+      12672,
+      1176
+    ],
+    "video_grid_thw": [
+      1,
+      3
+    ],
+    "second_per_grid_ts": [
+      1
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "target": "/home/wjy/models/Qwen2.5-VL-32B-Instruct",
+  "draft": "/home/wjy/models/Qwen2.5-VL-7B-Instruct",
+  "inputs_npz": [
+    "results/paddle_validation/ar_vs_lvspec_5cases/inputs_0.npz",
+    "results/paddle_validation/ar_vs_lvspec_5cases/inputs_1.npz",
+    "results/paddle_validation/ar_vs_lvspec_5cases/inputs_2.npz",
+    "results/paddle_validation/ar_vs_lvspec_5cases/inputs_3.npz",
+    "results/paddle_validation/ar_vs_lvspec_5cases/inputs_4.npz"
+  ],
+  "gpu_ids": "0,4,5",
+  "target_devices": "0,1",
+  "draft_devices": "2",
+  "dtype": "float16",
+  "max_new_tokens": 512,
+  "repeats": 2,
+  "interleave_methods": true,
+  "disable_cuda_graph": false,
+  "pack_draft_projections": true,
+  "drop_rate": 0.9,
+  "loose_hidden_k": 7,
+  "methods": [
+    "ar",
+    "lvspec"
+  ],
+  "output": "results/paddle_optimization/three_gpu_20261020_063411",
+  "paddle_version": "3.3.1",
+  "shared_target_draft": false,
+  "timing_scope": "decoding only; excludes prefill and preprocessing",
+  "input_sha256": [
+    "d13e4e0769a792606995c0c346ddee386ec853284b212f69a683345ea107a74a",
+    "f8ae11384b1e9cbc5ddd01a916b48cb9d33c451a336fcc98f92a57199d1f7b6a",
+    "ac78725c064f0fe3524563b6c6674db9d300286053a25f7f4a1ba979d0490ede",
+    "2cf7e6791b614dd1585e00b61eff77ee05ee591e89d693cebef2e8181d2502f9",
+    "71ee35f640d16147dada0d02cb291afc4cf93c9f91f338fdd51f8b20c81e0d5e"
+  ]
+}
