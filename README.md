@@ -1,217 +1,142 @@
-<div align="center">
-<h1>
-    <img src="assets/logo.png" height="100px" align="top"/>  
-    <br>  
-    <em>LVSpec</em>  
-    <br>  
-</h1>
+# LVSpec Paddle：视频大模型投机解码适配与优化
 
-<p align="center">
-<a href="https://arxiv.org/abs/2604.05650">
-  <img src="https://img.shields.io/badge/arXiv-2604.05650-b31b1b.svg"></a> 
-<a href="https://openreview.net/forum?id=ABTGbAZZwL">
-  <img src="https://img.shields.io/badge/ACL-2026-red.svg"></a> 
-<a href="https://opensource.org/licenses/Apache-2.0">
-  <img src="https://img.shields.io/badge/License-Apache_2.0-green.svg"></a> 
-<a href="https://github.com/zju-jiyicheng/LVSpec/pulls">
-    <img src="https://img.shields.io/badge/Contributions-welcome-blue.svg?style=flat"></a>
-</p>
+本项目基于 [LVSpec](https://github.com/zju-jiyicheng/LVSpec)，完成视频大模型推理流程的
+**原生 Paddle 适配、投机解码性能优化和真实视频验证**。目标是让原有 PyTorch 推理方法
+在 Paddle 环境中独立运行，并验证 LVSpec 相对自回归解码（AR）的速度与输出质量。
 
-<h2 style="color: #6a5acd; font-weight: bold;">
-🚀 Vision-Aware Verification with Improved Upper Bound
-</h2>
+最终在 **两张 A100 80GB、Qwen2.5-VL-32B＋7B、五个视频、每方法重复两遍**的测试中，
+LVSpec 相对同版 Paddle AR 的解码吞吐达到 **2.19×**，计入 prefill 后的吞吐达到 **1.63×**。
 
-</div>
+**汇报文档：** [交付报告：改动与优化](docs/DELIVERY_REPORT.md) ·
+[综合测试报告](docs/TEST_REPORT.md) · [完整复测记录](docs/PADDLE_OPTIMIZATION_TEST.md)
 
-## Paddle adaptation
+## 完成了什么
 
-This repository adds a native Paddle inference backend to
-[the upstream LVSpec project](https://github.com/zju-jiyicheng/LVSpec).
-The local five-video, two-A100 test measured **2.19× decoding throughput** and
-**1.63× throughput including prefill** relative to the same Paddle AR baseline.
-Answer quality is not established as lossless; these results are not a controlled
-Paddle-versus-PyTorch framework comparison.
+| 工作 | 实现内容 | 验证情况 |
+| --- | --- | --- |
+| 原项目复现 | 跑通原始 PyTorch quick inference，建立 AR/LVSpec 基线 | 三卡五视频完成 |
+| 模型迁移 | Paddle 实现 Qwen2.5-VL 视觉编码器、语言模型和多模态投影；提供 LLaVA-OneVision 视频实现 | Qwen 32B＋7B 实权重验证，LLaVA 小模型架构验证 |
+| 解码迁移 | AR、严格投机、LVSpec、LVSpec+PST；包含视觉剪枝、候选验证、接受及缓存回滚 | 四模式均有功能测试 |
+| 权重与设备适配 | HF safetensors 严格加载及 Linear 转置，可选导出 `.pdparams`；CPU 加载后按层放置到 GPU | 加载、转置、缓存及双卡回归通过 |
+| 推理优化 | 草稿链快速路径、RoPE/掩码复用、RMSNorm、CUDA Graph 和可选投影打包 | 五视频完整解码测试达到 2.19× |
+| 验证与交付 | 推理入口、运行脚本、固定输入基准、数值对齐、质量评审、显卡监测及报告 | 最新 35 项回归通过 |
 
-- [Setup and inference](docs/PADDLE.md)
-- [Delivery report: implementation and optimization](docs/DELIVERY_REPORT.md)
-- [Comprehensive test report](docs/TEST_REPORT.md)
-- [Saved test evidence and input regeneration](results/README.md)
+Paddle 环境中没有安装 Torch，模型前向、视觉剪枝和生成控制流都由 Paddle 执行。
+Transformers 用于 tokenizer/processor，数据通过 NumPy 输入 Paddle。
+本次采用手工迁移动态模型与生成控制流、加载转换权重的方式；完整生成循环没有通过
+X2Paddle 自动 trace 转换。成果以本仓库中的 Paddle 后端交付。
 
-The original paper description below documents the upstream work; its reported
-paper results are separate from the local Paddle measurements above.
+## 怎么优化
 
-Yicheng Ji*, Jun Zhang*, Jinpeng Chen, Cong Wang, Lidan Shou, Gang Chen, Huan Li (* equal contribution)
+初版迁移后的三卡完整测试只得到约 1.26× 解码加速。Profile 显示，草稿模型连续小步生成
+是主要优化方向，因此重点减少每 token、每层重复计算、Python 调度和 KV 操作。
 
-## 📣 Overview
-<p align="center">
-  <img src="assets/teaser.png" alt="Framework" width="100%"/>
-</p>
+| 优化 | 具体做法 | 作用 |
+| --- | --- | --- |
+| RoPE 与掩码复用 | 每次前向按设备计算并复用位置频率和 mask，适用时使用隐式因果注意力 | 减少各层重复构造 |
+| RMSNorm 与 GPU mask | 低精度 GPU 使用 fused RMSNorm；在 GPU 上构建 additive mask | 减少算子调度和主机交互 |
+| 草稿链快速路径 | 单链候选保留在 GPU，向量化接受判断，连续接受后截断缓存 | 减少逐 token 同步和不必要的分支路径拷贝 |
+| 延迟末端 KV | 只有整条候选链接受后才补齐末端 KV | 避免未被利用的草稿前向 |
+| CUDA Graph | 捕获固定步数的草稿生成块，更新 token/位置后重放 | 减少连续小算子的 Python 发起开销 |
+| 可选投影打包 | 合并草稿 Q/K/V 与 gate/up 投影调用 | 提供减少投影调用的路径，代价是额外显存 |
 
-## 🎉 News
-- 2025.08: Our paper <a href="https://arxiv.org/abs/2508.16201"><span style="color:#1581CC;">"SpecVLM: Enhancing Speculative Decoding of Video LLMs via Verifier-Guided Token Pruning"</span></a> has been accepted to EMNLP 2025 Main.
-- 2026.02: Our paper <a href="https://arxiv.org/abs/2603.19610"><span style="color:#1581CC;">"ParallelVLM: Lossless Video-LLM Acceleration with Visual Alignment Aware Parallel Speculative Decoding"</span></a> has been accepted to CVPR 2026.
-- 2026.04: Our paper <a href="https://arxiv.org/abs/2604.05650"><span style="color:#1581CC;">"See the Forest for the Trees: Loosely Speculative Decoding via Visual-Semantic Guidance for Efficient Inference of Video LLMs"</span></a> has been accepted to ACL 2026 Main with oral nomination.
-- 2026.04: Our paper <a href="https://arxiv.org/abs/2604.05546"><span style="color:#1581CC;">"Efficient Inference for Large Vision-Language Models: Bottlenecks, Techniques, and Prospects"</span></a> has been accepted to ACL 2026 Findings.
+CUDA Graph 当前用于满足条件的单卡 FP16/BF16 草稿、SDPA 和 greedy chain；其他情况使用
+普通 eager 路径。最终测试开启 Graph 和投影打包，**每条请求建图的开销也计入解码时间**。
+投影打包的单例测量没有显示独立收益，不将整体加速归因于这一项。
 
+优化过程、相关代码文件和代价见 [交付报告](docs/DELIVERY_REPORT.md)。
 
-<p align="center">
-  <img src="assets/intro.png" alt="LVSpec Framework" width="100%"/>
-</p>
+## 最终效果
 
-## 📖 Abstract
-Video Large Language Models (Video-LLMs) excel in video understanding but suffer from high inference latency due to autoregressive generation. Speculative Decoding (SD) mitigates this by applying a draft-and-verify paradigm, yet existing methods are constrained by rigid exact-match rules, severely limiting the acceleration potential. To bridge this gap, we propose LVSpec, the first training-free loosely SD framework tailored for Video-LLMs. Grounded in the insight that generation is governed by sparse visual-relevant anchors (mandating strictness) amidst abundant visual-irrelevant fillers (permitting loose verification), LVSpec employs a lightweight visual-relevant token identification scheme to accurately pinpoint the former. To further maximize acceptance, we augment this with a position-shift tolerant mechanism that effectively salvages positionally mismatched but semantically equivalent tokens. Experiments demonstrate that LVSpec is high-fidelity and rapid: it preserves $>99.8$% of target performance while accelerating Qwen2.5-VL-32B by $2.70 \times$ and LLaVA-OneVision-72B by $2.94 \times$. Notably, it boosts the mean accepted length and speedup ratio by $136$% and $35$% compared to SOTA training-free SD methods for Video-LLMs. Code is provided in the submitted software.
+测试配置：目标 Qwen2.5-VL-32B、草稿 7B，各用一张 A100 80GB；Paddle GPU 3.3.1、
+FP16、greedy、batch size 1。VideoDetailCaption 五个视频，每视频 64 帧，生成上限 512 token，
+每种方法重复两遍，共 20 次推理；使用相同 NPZ 输入，预热后交替方法顺序运行。
 
+| 指标 | Paddle AR | Paddle LVSpec | 结果 |
+| --- | ---: | ---: | --- |
+| 解码吞吐，token/s | 13.49 | 29.60 | **2.19×** |
+| 含 prefill 吞吐，token/s | 12.11 | 19.68 | **1.63×** |
+| 平均生成长度，token | 512.0 | 393.2 | 回答长度不同 |
+| 正确性 / 覆盖度代理分，0–5 | 3.60 / 3.60 | 3.40 / 3.40 | 质量保持仍需进一步验证 |
 
+吞吐按总生成 token 数除以总时间计算，排除模型加载和视频预处理。
+五视频逐例解码加速分别为 **2.07×、2.02×、2.16×、2.30×、2.36×**，
+两次重复输出 token IDs 一致。185 次显卡采样未观察到同卡其他计算进程。
 
-## 📌  Method
-<p align="center">
-  <img src="assets/method.png" alt="LVSpec Framework" width="80%"/>
-</p>
+功能验证共 **35 项通过**：CPU 后端/CLI/指标 26 项，GPU 9 项。
+另通过正式 Paddle CLI 跑通了三个真实视频的读取、预处理、推理及结果保存。
 
+以上是限定配置下的实测结果。五视频质量评分由本地模型辅助完成，存在遗漏和评审偏差，
+不能换算成正式准确率或宣称无损。真实 7B 的严格跨框架数值检查仍有未通过项。
+优化版三卡测试受到其他任务干扰，尚需无干扰复测；当前数据也不能用于认定 Paddle 比
+PyTorch 框架更快。历史测试及失败记录均保存在 [综合测试报告](docs/TEST_REPORT.md)。
 
+## 快速运行 Paddle
 
+### 环境与模型
 
-## ⚙️ Environment Setup
-
-Install the required dependencies:
-```bash
-conda create -n lvspec python==3.10 -y
-conda activate lvspec
-pip install torch torchvision
-pip install -r requirements.txt
-```
-
-
-## 🛠 Download Models & Datasets
-- [For LLaVA-OneVision models](https://huggingface.co/llava-hf)
-- [For Qwen2.5-VL models](https://huggingface.co/Qwen)
-- [For VideoDetailCaption dataset](https://huggingface.co/datasets/lmms-lab/VideoDetailCaption)
-- [For lmm-eval evaluation](https://github.com/EvolvingLMMs-Lab/lmms-eval)
-
-
-## 🚀 Quick Inference
-### Paddle backend
-
-Native Paddle video inference is available for Qwen2.5-VL and LLaVA-OneVision,
-including AR, SpecVLM, LVSpec and LVSpec+PST. See [Paddle setup and validation](docs/PADDLE.md)
-for dependencies, weight loading, GPU placement, supported inputs and verification.
+在独立环境安装与本机 CUDA 匹配的 Paddle GPU，再安装后端依赖。
+已验证环境为 Python 3.13、Paddle GPU 3.3.1、CUDA runtime 12.6。
+具体环境和支持参数见 [Paddle 使用说明](docs/PADDLE.md)。
 
 ```bash
-METHOD=lvspec bash run_qwenvl_paddle.sh
-# Equivalent entry point: python inference.py --backend paddle --help
+python -m pip install -r requirements-paddle.txt
+python inference.py --backend paddle --help
 ```
 
-Run the demo script to quickly evaluate LVSpec:
-```bash
-# Qwen2.5-VL
-sh run_qwenvl.sh
+准备 Qwen2.5-VL-32B/7B 的 HF 权重和 VideoDetailCaption 数据集。
+模型、视频和大型 NPZ 输入不随仓库上传；生成测试输入的方法见 [测试记录说明](results/README.md)。
 
-# LLaVA-OneVision
-sh run_llava.sh
-```
-We support autoregressive, naive speculative decoding, SpecVLM, and LVSpec inference.
-Please also modify the model path, data path, pruning ratio, and frame number in the `.sh` file.
+### 三个真实视频快速检查
 
-After running the script, the output and efficiency metric will be stored in the `save_path`.
-
-To compare full-input autoregressive decoding with LVSpec, run both on the same
-samples, GPU configuration, frame count, and generation limit:
+下面使用两张 A100 80GB，目标与草稿各一张卡，生成上限 64 token，用于快速检查完整链路。
+执行前修改路径并确认所选 GPU 空闲。
 
 ```bash
-METHOD=ar bash run_qwenvl.sh
-METHOD=lvspec bash run_qwenvl.sh
-python compare_speed.py \
-  --baseline 'results/{qwen2_5_vl}_{ar}_drop{0.9}_frame{64}' \
-  --accelerated 'results/{qwen2_5_vl}_{lvspec}_drop{0.9}_frame{64}' \
-  --output results/speed_comparison.json
+BASE_MODEL_PATH=/path/to/Qwen2.5-VL-32B-Instruct \
+DRAFT_MODEL_PATH=/path/to/Qwen2.5-VL-7B-Instruct \
+DATA_PATH=/path/to/VideoDetailCaption \
+GPU_IDS=0,1 METHOD=lvspec EVAL_NUM=3 FRAME_NUM=64 MAX_NEW_TOKENS=64 \
+SAVE_PATH=results/paddle_quick \
+bash run_qwenvl_paddle.sh \
+  --target_devices 0 --draft_devices 1 --pack_draft_projections --save_inputs
 ```
 
-The AR branch uses the target model's full visual input; `drop_rate` only affects
-the speculative draft input.
+`--target_devices` 与 `--draft_devices` 使用可见卡重编号后的逻辑编号。
+结果写入 `results.jsonl`、`metric.jsonl` 和 `run_config.json`；保存输入便于之后做一致对比。
+完整的五视频、512-token 性能基准应按 [复测命令](docs/PADDLE_OPTIMIZATION_TEST.md) 运行，
+上述 64-token 快速检查不用于复现 2.19× 指标。
 
-The throughput speedup is `(LVSpec total tokens / LVSpec total decoding time)`
-divided by `(AR total tokens / AR total decoding time)`, using the repository's
-token counters. This measures decoding only, excluding prefill and video
-preprocessing. The report also includes the decoding time ratio; output lengths
-can differ between methods. This timing comparison does not measure answer quality.
-
-
-## 🚀 Benchmark Evaluation
-We use [lmm-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval) to evaluate the performance metric on `VideoDetailCaption`, `VideoDetailDescription`, `MovieChat`, and `Video-MME`. You may take the following steps:
+### 功能回归
 
 ```bash
-# Clone lmm-eval and install the dependancies.
-git clone https://github.com/EvolvingLMMs-Lab/lmms-eval.git
+python -m pip install pytest
+CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=1 python -m pytest -q tests/paddle
 ```
 
-1. Put the file `evaluation/llava_onevision_lvspec.py` and `evaluation/qwen2_5_vl_lvspec.py` under `lmms-eval/lmms_eval/models/` and modify `lmms-eval/lmms_eval/models/__init__.py` to register. Also put the two `.sh` file under `lmms-eval/examples/models`.
+GPU 检查需要两张可用显卡。测试覆盖 Qwen/LLaVA 小模型、权重加载、缓存回滚、树分支、
+生成边界、CLI、不同精度和 CUDA Graph。
 
-2. To make sure the LVSpec repository is accessible in lmm-eval, you can clone the LVSpec repo to `lmms-eval/lmms_eval`.
+## 主要代码与文档
 
-3. Modify the corresponding configs in `/lmms-eval/lmms_eval/tasks`. Then launch the LLM judge as in `LVSpec/evaluation/sglang.sh`.
+| 位置 | 内容 |
+| --- | --- |
+| [paddle_backend/](paddle_backend/) | 原生 Paddle 模型、权重加载、预处理、KV Cache、解码及优化 |
+| [run_qwenvl_paddle.sh](run_qwenvl_paddle.sh) | Qwen Paddle 推理脚本 |
+| [run_llava_paddle.sh](run_llava_paddle.sh) | LLaVA Paddle 视频推理脚本 |
+| [tools/](tools/) | 固定输入基准、数值参考导出/校验、质量评审和显卡监测 |
+| [tests/paddle/](tests/paddle/) | 后端功能与 GPU 回归 |
+| [evaluation/paddle_lvspec.py](evaluation/paddle_lvspec.py) | lmms-eval 视频生成适配器，完整数据集评测尚未执行 |
+| [交付报告](docs/DELIVERY_REPORT.md) | 改了什么、如何优化、效果和交付范围 |
+| [综合测试报告](docs/TEST_REPORT.md) | 全部测试、数值失败项、质量差异及证据索引 |
+| [测试记录](results/README.md) | 已上传的实测产物及输入生成方式 |
 
-```bash
-# In lmm-eval
-# llava-onevision
-bash examples/models/llava_onevision_specvlm.sh
+当前支持 greedy、batch size 1 的视频推理；Qwen 已做真实 32B＋7B 验证，
+LLaVA 尚缺实权重验证。训练、量化、LLaVA AnyRes 图像路径等不在本次交付范围。
 
-# qwen2.5-vl
-bash examples/models/qwen25vl_specvlm.sh
-```
-After running, both the performance metric and efficiency metric will be recorded.
+## 原项目与致谢
 
-We recommand using `quick inference` for quick testing, and using `benchmark evaluation` to reproduce the results in the paper. Because running within lmm-eval enables support for vLLM, standard benchmark configurations, and qwen-vl-utils.
-
-
-## 🛩️ Future Work
-- [ ] Explore vision-aware drafting structures.
-- [ ] Adapt to complex visual reasoning scenarios.
-- [ ] Explore design in the training phase.
-
-
-
-## Note
-- Our method primarily targets resource-constrained long-video scenarios, where GPU memory bandwidth constitutes the main bottleneck during inference. Hence, the speedup ratio is sensitive to hardware settings.
-Users are advised to set the input length according to GPU capacity. Theoretically, as frame number grows, SpecVLM and LVSpec achieve higher acceleration ratios.
-- Our LVSpec is built upon the repository of [SpecVLM](https://github.com/zju-jiyicheng/SpecVLM). To focus on studying the effect of vision-aware verification, we apply simple uniform visual token pruning.
-
-## Citation
-If you find our work useful or relevant to your research, please kindly cite our papers:
-```bibtex
-@inproceedings{ji2025specvlm,
-  title={Specvlm: Enhancing speculative decoding of video llms via verifier-guided token pruning},
-  author={Ji, Yicheng and Zhang, Jun and Xia, Heming and Chen, Jinpeng and Shou, Lidan and Chen, Gang and Li, Huan},
-  booktitle={Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing},
-  pages={7216--7230},
-  year={2025}
-}
-
-@misc{ji2026foresttreeslooselyspeculative,
-  title={See the Forest for the Trees: Loosely Speculative Decoding via Visual-Semantic Guidance for Efficient Inference of Video LLMs},
-  author={Yicheng Ji and Jun Zhang and Jinpeng Chen and Cong Wang and Lidan Shou and Gang Chen and Huan Li},
-  year={2026},
-  eprint={2604.05650},
-  archivePrefix={arXiv},
-  primaryClass={cs.CL},
-  url={https://arxiv.org/abs/2604.05650}
-}
-
-@article{kong2026parallelvlm,
-  title={ParallelVLM: Lossless Video-LLM Acceleration with Visual Alignment Aware Parallel Speculative Decoding},
-  author={Kong, Quan and Shen, Yuhao and Ji, Yicheng and Li, Huan and Wang, Cong},
-  journal={arXiv preprint arXiv:2603.19610},
-  year={2026},
-  url={https://arxiv.org/abs/2603.19610}
-}
-
-@misc{zhang2026efficientinferencelargevisionlanguage,
-      title={Efficient Inference for Large Vision-Language Models: Bottlenecks, Techniques, and Prospects}, 
-      author={Jun Zhang and Yicheng Ji and Feiyang Ren and Yihang Li and Bowen Zeng and Zonghao Chen and Ke Chen and Lidan Shou and Gang Chen and Huan Li},
-      year={2026},
-      eprint={2604.05546},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2604.05546}, 
-}
-
-```
+LVSpec 算法、原始 PyTorch 模型代码和论文素材来自
+[zju-jiyicheng/LVSpec](https://github.com/zju-jiyicheng/LVSpec)。本仓库的工作重点是
+Paddle 工程适配、推理优化与验证。上游论文介绍、作者信息和引用保留在
+[原项目 README](docs/UPSTREAM_README.md)。
