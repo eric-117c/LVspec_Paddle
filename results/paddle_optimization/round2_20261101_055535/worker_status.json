@@ -1,0 +1,13 @@
+{
+  "status": "stopped",
+  "pid": 2636273,
+  "physical_gpu_ids": [
+    1,
+    3
+  ],
+  "started_utc": "2026-11-01T05:55:35.373766+00:00",
+  "job": "previous_case2",
+  "last_job": "previous_case2",
+  "last_job_status": "complete",
+  "stopped_utc": "2026-11-01T06:16:01.092147+00:00"
+}

@@ -1,0 +1,20 @@
+{
+  "status": "complete",
+  "date": "2026-11-01",
+  "output": "results/paddle_optimization/round2_20261101_055535",
+  "decoding_throughput_speedup": 2.2121625521493207,
+  "inference_throughput_speedup": 1.674198428335015,
+  "regressions_passed": 35,
+  "complete_five_video_runs": 20,
+  "same_weights_previous_version_runs": 4,
+  "all_outputs_identical_to_previous": true,
+  "no_other_compute_process_observed": true,
+  "quality": "Scored captions unchanged; correctness/coverage AR=3.6, LVSpec=3.4. Not official accuracy.",
+  "gpu_resources_released": true,
+  "physical_gpu_ids": [
+    1,
+    3
+  ],
+  "previous_validated_run": "results/paddle_optimization/two_gpu_clean_20261020_065626",
+  "previous_decoding_throughput_speedup": 2.1947733650624475
+}

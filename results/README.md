@@ -5,6 +5,7 @@
 
 主要结果入口：
 
+- [2026-11-01 第二轮优化：两卡五视频完整比较，2.212×](paddle_optimization/round2_20261101_055535/five_cases/comparison.json)
 - [原始 PyTorch 三卡比较](qwen2_5_vl_3gpu_original_kv/speed_comparison.json)
 - [Paddle 优化前三卡比较](paddle_validation/ar_vs_lvspec_5cases/comparison.json)
 - [Paddle 优化后三卡受干扰比较](paddle_optimization/three_gpu_20261020_063411/comparison.json)

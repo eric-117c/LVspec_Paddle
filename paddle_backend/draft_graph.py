@@ -1,5 +1,6 @@
 """CUDA graph for fixed-width greedy drafting with device-side KV positions."""
 
+import numpy as np
 import paddle
 from paddle.device.cuda.graphs import CUDAGraph
 
@@ -19,8 +20,12 @@ class DraftGraph:
         self.device = device_of(model.text_model.embed_tokens.weight)
         self.capacity = cache.layers[0].capacity
         with paddle.device.device_guard(self.device):
-            self.token = paddle.to_tensor([[root]], dtype="int64")
-            self.position = paddle.to_tensor([cache.length], dtype="int64")
+            # Keep both graph inputs in one persistent allocation. Updating it
+            # from NumPy avoids two temporary CUDA tensors and device copies.
+            self.inputs = paddle.to_tensor([root, cache.length], dtype="int64")
+            self.token = self.inputs[:1].reshape([1, 1])
+            self.position = self.inputs[1:]
+            self.offsets = paddle.arange(count - 1, dtype="int64")
             self.key_positions = paddle.arange(self.capacity, dtype="int64")
             config = model.config
             scaling = config.rope_scaling or {}
@@ -46,12 +51,9 @@ class DraftGraph:
             self.output = self._block()
             self.graph.capture_end()
 
-    def _step(self, token, position):
+    def _step(self, token, position, frequencies, mask):
         model = self.model
         x = model.text_model.embed_tokens(token)
-        frequencies = tuple(paddle.index_select(table, position).unsqueeze(0).unsqueeze(0)
-                            for table in (self.cos, self.sin))
-        mask = additive_mask((self.key_positions <= position).reshape([1, 1, 1, self.capacity]), x.dtype)
         for block, cache, key_storage, value_storage in zip(
                 model.text_model.layers, self.cache.layers, self.keys, self.values):
             residual = x
@@ -80,15 +82,23 @@ class DraftGraph:
     def _block(self):
         token = self.token
         tokens = [token]
+        # All positions are known before drafting; prepare their metadata in
+        # one batch rather than launching the same small kernels per token.
+        positions = self.position + self.offsets
+        frequencies = tuple(paddle.index_select(table, positions).unsqueeze(0).unsqueeze(0)
+                            for table in (self.cos, self.sin))
+        masks = additive_mask(self.key_positions.unsqueeze(0) <= positions.unsqueeze(1),
+                              self.model.text_model.embed_tokens.weight.dtype)
         for offset in range(self.count - 1):
-            token = self._step(token, self.position + offset)
+            token = self._step(token, positions[offset:offset + 1],
+                tuple(table[:, :, offset:offset + 1] for table in frequencies),
+                masks[offset:offset + 1].reshape([1, 1, 1, self.capacity]))
             tokens.append(token)
         return paddle.concat(tokens, axis=1)
 
     def replay(self, root, prefix):
         with paddle.device.device_guard(self.device):
-            self.token.set_value(paddle.to_tensor([[root]], dtype="int64"))
-            self.position.set_value(paddle.to_tensor([prefix], dtype="int64"))
+            self.inputs.set_value(np.asarray([root, prefix], dtype=np.int64))
             self.graph.replay()
             for layer in self.cache.layers:
                 layer.length = prefix + self.count - 1

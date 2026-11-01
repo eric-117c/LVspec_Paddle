@@ -1,0 +1,5 @@
+{
+  "source": "results/paddle_optimization/two_gpu_clean_20261020_065626/judge_cache.jsonl",
+  "sha256": "7b4d7e526c2cc109f44f06efa774670071f2dbbf71cc3130a44c632cdc2168be",
+  "reuse": "Only identical checkpoint/config/rubric/question/reference/prediction hash entries are reused"
+}

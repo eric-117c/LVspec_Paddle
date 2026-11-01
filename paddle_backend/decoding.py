@@ -59,16 +59,23 @@ def drop_visual_tokens_uniform(inputs, drop_rate=0.9, visual_token_id=151656):
     return result
 
 
-def visual_similarity_hidden_state(prefill_hidden, tree_hidden, topk=10, chunk_size=2048):
+def _normalized_visual_chunks(prefill_hidden, tree_hidden, chunk_size=2048):
     visual = prefill_hidden[0] if prefill_hidden.ndim == 3 else prefill_hidden
     if visual.shape[0] == 0:
         raise ValueError("Visual similarity requires nonempty prefill hidden states")
     visual = move(visual, tree_hidden).astype("float32")
+    return tuple(F.normalize(visual[start:start + chunk_size], axis=-1)
+                 for start in range(0, visual.shape[0], chunk_size))
+
+
+def visual_similarity_hidden_state(prefill_hidden, tree_hidden, topk=10, chunk_size=2048,
+                                  normalized_reference=None):
+    parts = (_normalized_visual_chunks(prefill_hidden, tree_hidden, chunk_size)
+             if normalized_reference is None else normalized_reference)
     tree = F.normalize(tree_hidden.astype("float32"), axis=-1)
-    k = min(topk, visual.shape[0])
+    k = min(topk, sum(part.shape[0] for part in parts))
     best = None
-    for start in range(0, visual.shape[0], chunk_size):
-        part = F.normalize(visual[start:start + chunk_size], axis=-1)
+    for part in parts:
         scores = paddle.matmul(tree, part, transpose_y=True)
         combined = scores if best is None else paddle.concat([best, scores], axis=-1)
         best = paddle.topk(combined, min(k, combined.shape[-1]), axis=-1)[0]
@@ -193,6 +200,7 @@ def generate(inputs, model, draft_model=None, method="lvspec", max_new_tokens=51
     decode_start = time.perf_counter()
     generated, accepted_lengths = [], []
     draft_graph = None
+    reference_chunks = None
     while len(generated) < max_new_tokens:
         remaining = max_new_tokens - len(generated)
         if method == "ar":
@@ -222,11 +230,22 @@ def generate(inputs, model, draft_model=None, method="lvspec", max_new_tokens=51
             predictions = paddle.argmax(output.logits[0], axis=-1)
             candidates_on_target = move(candidates, predictions)
             predicted = predictions[:-1].unsqueeze(0)
-            scores = None if reference_hidden is None else visual_similarity_hidden_state(
-                reference_hidden, output.hidden_states[:, :-1])
-            length = int(acceptance_lengths(predicted == candidates_on_target[:, 1:], scores,
-                loose_hidden_k, candidates_on_target, predicted, pst=method == "lvspec_with_pst")[0].item()) + 1
-            accepted, stop = _trim(candidates_on_target[0, :min(length, remaining)].tolist(), remaining, eos)
+            scores = None
+            if reference_hidden is not None:
+                if reference_chunks is None:
+                    # Prompt hidden states are fixed for the whole request.
+                    # Prepare lazily here so this work stays inside decode timing.
+                    reference_chunks = _normalized_visual_chunks(reference_hidden, output.hidden_states)
+                scores = visual_similarity_hidden_state(reference_hidden, output.hidden_states[:, :-1],
+                                                        normalized_reference=reference_chunks)
+            lengths = acceptance_lengths(predicted == candidates_on_target[:, 1:], scores,
+                loose_hidden_k, candidates_on_target, predicted, pst=method == "lvspec_with_pst")
+            # Read the decision, candidates and next-root predictions in one
+            # transfer instead of synchronizing for length, tokens and root.
+            decision = paddle.concat([lengths.reshape([-1]), candidates_on_target.reshape([-1]),
+                                      predictions.reshape([-1])]).tolist()
+            length = decision[0] + 1
+            accepted, stop = _trim(decision[1:1 + min(length, remaining)], remaining, eos)
             count = len(accepted)
             cache.truncate(target_prefix + count)
             if count == extra:
@@ -236,7 +255,7 @@ def generate(inputs, model, draft_model=None, method="lvspec", max_new_tokens=51
             draft_cache.truncate(draft_prefix + count)
             generated.extend(accepted)
             accepted_lengths.append(count)
-            root = int(predictions[count - 1].item())
+            root = decision[1 + extra + count - 1]
             if stop:
                 break
             continue

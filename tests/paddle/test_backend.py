@@ -91,11 +91,17 @@ def test_loose_and_position_shift_acceptance():
 
 
 def test_chunked_visual_similarity_matches_dense():
+    from paddle_backend.decoding import _normalized_visual_chunks
     paddle.seed(45)
     visual, tree = paddle.randn([1, 19, 32]), paddle.randn([2, 5, 32])
     a = visual_similarity_hidden_state(visual, tree, chunk_size=4)
     b = visual_similarity_hidden_state(visual, tree, chunk_size=100)
     np.testing.assert_allclose(a.numpy(), b.numpy(), atol=1e-6)
+    reference = _normalized_visual_chunks(visual, tree, chunk_size=4)
+    for candidates in (tree, paddle.randn([1, 3, 32])):
+        expected = visual_similarity_hidden_state(visual, candidates, chunk_size=4)
+        cached = visual_similarity_hidden_state(visual, candidates, normalized_reference=reference)
+        np.testing.assert_array_equal(cached.numpy(), expected.numpy())
 
 
 @paddle.no_grad()

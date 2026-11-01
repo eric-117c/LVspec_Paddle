@@ -1,0 +1,6 @@
+{
+  "target": "/home/wjy/models/Qwen2.5-VL-32B-Instruct",
+  "draft": "/home/wjy/models/Qwen2.5-VL-7B-Instruct",
+  "gpu_ids": "1,3",
+  "packing": "applied once after loading; benchmark packing function becomes a no-op"
+}

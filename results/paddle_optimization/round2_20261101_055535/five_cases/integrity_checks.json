@@ -1,0 +1,18 @@
+{
+  "input_hashes_match_previous": true,
+  "ar": {
+    "runs": 10,
+    "complete_pairs": true,
+    "token_accounting_passed": true,
+    "all_outputs_identical_to_previous": true,
+    "repeats_identical": true
+  },
+  "lvspec": {
+    "runs": 10,
+    "complete_pairs": true,
+    "token_accounting_passed": true,
+    "all_outputs_identical_to_previous": true,
+    "repeats_identical": true
+  },
+  "source_hashes_match": true
+}

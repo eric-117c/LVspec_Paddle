@@ -1,0 +1,10 @@
+{
+  "name": "previous_case2",
+  "indices": [
+    2
+  ],
+  "tokens": 512,
+  "repeats": 2,
+  "variant": "previous",
+  "purpose": "Same resident weights and devices; previous code snapshot comparison on a long input"
+}

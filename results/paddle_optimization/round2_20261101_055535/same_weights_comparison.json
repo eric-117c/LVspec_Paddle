@@ -1,0 +1,43 @@
+{
+  "scope": "One long input, 512-token cap, two repeats/method, same resident weights/devices. Previous version ran after the full new-version run; not randomized or a full five-case old/new experiment.",
+  "original_input_index": 2,
+  "previous": {
+    "ar": 12.824427907483024,
+    "lvspec": 27.88660646094466
+  },
+  "new": {
+    "ar": 12.837846842112265,
+    "lvspec": 27.967838763388187
+  },
+  "previous_lvspec_vs_ar": 2.174491264805106,
+  "new_lvspec_vs_ar": 2.1785459125158497,
+  "lvspec_throughput_ratio_new_vs_previous": 1.002912950435805,
+  "tokens_and_acceptance_identical": true,
+  "previous_snapshot_sha256": {
+    "decoding": "92055cf33aaeb3d28ec3872a82b6b5c127e0d00eb6988352d3930d025bc0c3b3",
+    "draft_graph": "b3e133cf216176ff6da851a2adf32faceda023d06cca660236b782a17c30d78b"
+  },
+  "new_gpu_monitor": {
+    "benchmark_pid": 2636273,
+    "physical_gpu_ids": [
+      "1",
+      "3"
+    ],
+    "snapshots": 119,
+    "other_compute_pids": [],
+    "no_other_compute_process_observed": true,
+    "sampling_interval_seconds": 5
+  },
+  "previous_gpu_monitor": {
+    "benchmark_pid": 2636273,
+    "physical_gpu_ids": [
+      "1",
+      "3"
+    ],
+    "snapshots": 30,
+    "other_compute_pids": [],
+    "no_other_compute_process_observed": true,
+    "sampling_interval_seconds": 5
+  },
+  "previous_commit": "5f2c5d6c92106d4092588d797dded6a5d20d2363"
+}
